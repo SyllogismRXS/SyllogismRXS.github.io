@@ -18,13 +18,14 @@ email: kevin.demarco@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   I write about robotics, technology, music, and bicycling. 
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "http://kevindemarco.com" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: syllogismrxs
 github_username:  SyllogismRXS
 
 # Build settings
 markdown: kramdown
-theme: minima
+#theme: minima
+theme: minimal-mistakes-jekyll
 plugins:
   - jekyll-feed
 
@@ -39,3 +40,89 @@ plugins:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+# minimal-mistakes-jekyll configuration
+paginate: 5
+include: ["_pages"]
+minimal_mistakes_skin: "contrast" #"default" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum" "sunrise"
+locale: "en-US"
+timezone: America/New_York
+name: "Kevin DeMarco"
+repository: "SyllogismRXS/SyllogismRXS.github.io"
+search: true
+
+defaults:
+  # _posts
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: single
+      author_profile: true
+      read_time: true
+      comments: true
+      share: true
+      related: true      
+  # _pages
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: single
+      author_profile: true
+      read_time: false
+      comments: false
+      share: false
+      related: true
+
+comments:
+  provider: "disqus"
+  disqus:
+    shortname: "demarco"
+
+twitter:
+  username: "syllogismrxs"
+
+social:
+  type:  Person
+  name:  Kevin DeMarco
+  links:
+    - "https://twitter.com/syllogismrxs"
+    - "https://instagram.com/syllogismrxs"
+    - "https://www.linkedin.com/in/kevindemarco"
+
+analytics:
+  provider: "google-gtag"
+  google:
+    tracking_id: "UA-23277342-1"
+    anonymize_ip: false # default
+
+author:
+  name     : "Kevin DeMarco"
+  avatar   : "/assets/biking-face.jpg"
+  bio      : "Roboticist"
+  location : "Atlanta, GA, USA"
+  links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/SyllogismRXS"
+    - label: "Instagram"
+      icon: "fab fa-fw fa-instagram"
+      url: "https://instagram.com/syllogismrxs"
+    - label: "Twitter"
+      icon: "fab fa-fw fa-twitter-square"
+      url: "https://twitter.com/syllogismrxs"
+
+footer:
+  links:
+    links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/SyllogismRXS"
+    - label: "Instagram"
+      icon: "fab fa-fw fa-instagram"
+      url: "https://instagram.com/syllogismrxs"
+    - label: "Twitter"
+      icon: "fab fa-fw fa-twitter-square"
+      url: "https://twitter.com/syllogismrxs"
+      
