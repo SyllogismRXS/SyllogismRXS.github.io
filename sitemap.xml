@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc>http://kevindemarco.com/jekyll/update/2019/06/05/welcome-to-jekyll.html</loc>
+<lastmod>2019-06-05T23:11:13-04:00</lastmod>
+</url>
+<url>
+<loc>http://kevindemarco.com/about/</loc>
+</url>
+<url>
+<loc>http://kevindemarco.com/</loc>
+</url>
+<url>
+<loc>http://kevindemarco.com/projects/</loc>
+</url>
+<url>
+<loc>http://kevindemarco.com/publications/</loc>
+</url>
+</urlset>
