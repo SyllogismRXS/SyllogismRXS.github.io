@@ -44,10 +44,13 @@ host machine will use `ngrok` to provide an SSH tunnel (cf. [ngrok][ngrok]).
 
 ## One-Time Host Linux Machine Configuration
 
-### Install SSH server and snap package manager
+### Install Package Dependencies
+
+Install the SSH server, tmux, and the snap package manager with your system's
+package manager:
 
 {% highlight bash %}
-$ sudo apt-get install openssh-server snapd
+$ sudo apt-get install openssh-server tmux snapd
 {% endhighlight %}
 
 ### Install the ngrok snap package
