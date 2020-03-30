@@ -1,6 +1,12 @@
 Kevin DeMarco's Blog
 ====================
 
+Dependencies
+------------
+
+    $ gem install bundler
+    $ gem install jekyll
+
 Development
 -----------
 
