@@ -1,6 +1,10 @@
 Kevin DeMarco's Blog
 ====================
 
+While on the "blog" branch.
+
+    $ cd blog
+
 Dependencies
 ------------
 
@@ -12,7 +16,16 @@ Development
 
     $ bundle exec jekyll serve
 
-Build
------
+Deploy
+------
 
     $ JEKYLL_ENV=production bundle exec jekyll build
+
+
+The static pages need to be pushed to the "master" branch to be served by GitHub:
+
+    $ cd ../
+    $ git checkout master
+    $ cp -r ./blog/_site .
+    $ git commit -a -m "some message"
+    $ git push origin master
