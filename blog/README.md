@@ -15,4 +15,4 @@ Development
 Build
 -----
 
-    $ JEKYLL_ENV=production jekyll build
+    $ JEKYLL_ENV=production bundle exec jekyll build
