@@ -1,0 +1,653 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.1 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Remote Pair Programming via SSH and wemux on Linux - Kevin DeMarco</title>
+<meta name="description" content="There are several benefits to the use of pair programming in the software development process: fewer mistakes, better understanding of the codebase across multiple developers, and improved team cohesiveness (cf. The Pros and Cons of Pair Programming). Personally, I have found pair programming can be especially useful for training. Experienced developers forget the multitude of tiny stumbling blocks that less experienced developers encounter on a daily basis. Also, it can be helpful for less experienced developers to see how experienced developers have customized their tools for increased productivity (e.g., terminal setup, emacs config, vim config, etc.)  ">
+
+
+  <meta name="author" content="Kevin DeMarco">
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Kevin DeMarco">
+<meta property="og:title" content="Remote Pair Programming via SSH and wemux on Linux">
+<meta property="og:url" content="http://kevindemarco.com/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming.html">
+
+
+  <meta property="og:description" content="There are several benefits to the use of pair programming in the software development process: fewer mistakes, better understanding of the codebase across multiple developers, and improved team cohesiveness (cf. The Pros and Cons of Pair Programming). Personally, I have found pair programming can be especially useful for training. Experienced developers forget the multitude of tiny stumbling blocks that less experienced developers encounter on a daily basis. Also, it can be helpful for less experienced developers to see how experienced developers have customized their tools for increased productivity (e.g., terminal setup, emacs config, vim config, etc.)  ">
+
+
+
+
+
+  <meta name="twitter:site" content="@syllogismrxs">
+  <meta name="twitter:title" content="Remote Pair Programming via SSH and wemux on Linux">
+  <meta name="twitter:description" content="There are several benefits to the use of pair programming in the software development process: fewer mistakes, better understanding of the codebase across multiple developers, and improved team cohesiveness (cf. The Pros and Cons of Pair Programming). Personally, I have found pair programming can be especially useful for training. Experienced developers forget the multitude of tiny stumbling blocks that less experienced developers encounter on a daily basis. Also, it can be helpful for less experienced developers to see how experienced developers have customized their tools for increased productivity (e.g., terminal setup, emacs config, vim config, etc.)  ">
+  <meta name="twitter:url" content="http://kevindemarco.com/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming.html">
+
+  
+    <meta name="twitter:card" content="summary">
+    
+  
+
+  
+
+
+
+  <meta property="article:published_time" content="2020-03-25T23:11:13-04:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://kevindemarco.com/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Kevin DeMarco",
+      "url": "http://kevindemarco.com/",
+      "sameAs": ["https://twitter.com/syllogismrxs","https://instagram.com/syllogismrxs","https://www.linkedin.com/in/kevindemarco"]
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Kevin DeMarco Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          Kevin DeMarco
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/projects">Projects</a>
+            </li><li class="masthead__menu-item">
+              <a href="/publications">Publications</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about">About</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/biking-face.jpg" alt="Kevin DeMarco" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Kevin DeMarco</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Roboticist</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Atlanta, GA, USA</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://github.com/SyllogismRXS" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+          
+        
+          
+            <li><a href="https://instagram.com/syllogismrxs" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-instagram" aria-hidden="true"></i> Instagram</a></li>
+          
+        
+          
+            <li><a href="https://twitter.com/syllogismrxs" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Remote Pair Programming via SSH and wemux on Linux">
+    <meta itemprop="description" content="There are several benefits to the use of pair programming in the softwaredevelopment process: fewer mistakes, better understanding of the codebaseacross multiple developers, and improved team cohesiveness (cf. The Pros andCons of Pair Programming). Personally,I have found pair programming can be especially useful fortraining. Experienced developers forget the multitude of tiny stumbling blocksthat less experienced developers encounter on a daily basis. Also, it can behelpful for less experienced developers to see how experienced developers havecustomized their tools for increased productivity (e.g., terminal setup, emacsconfig, vim config, etc.)">
+    <meta itemprop="datePublished" content="2020-03-25T23:11:13-04:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Remote Pair Programming via SSH and wemux on Linux
+</h1>
+          
+            <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  5 minute read
+
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>There are several benefits to the use of pair programming in the software
+development process: fewer mistakes, better understanding of the codebase
+across multiple developers, and improved team cohesiveness (cf. <a href="https://www.verypossible.com/blog/pros-and-cons-of-pair-programming">The Pros and
+Cons of Pair Programming</a>). Personally,
+I have found pair programming can be especially useful for
+training. Experienced developers forget the multitude of tiny stumbling blocks
+that less experienced developers encounter on a daily basis. Also, it can be
+helpful for less experienced developers to see how experienced developers have
+customized their tools for increased productivity (e.g., terminal setup, emacs
+config, vim config, etc.)</p>
+
+<p>However, when working remotely, pair programming can be difficult without a
+simple and secure process. In this post, I describe the steps required to setup
+a secure pair programming process in which one (remote) developer SSH’s into
+another (host) developer’s Linux machine. The host developer will be able to
+specify which remote developers have access and also see the command line
+keyboard entries made by the remote developer. We will also configure the host
+machine such that the remote user will not be able to SSH into the host machine
+unless the host developer runs a specific terminal sharing program (i.e.,
+wemux). While this setup is fairly secure, you shouldn’t grant access to remote
+developers that you don’t trust.</p>
+
+<h2 id="system-overview">System Overview</h2>
+
+<p>A high-level diagram of the setup is shown in the following figure.</p>
+
+<p><img src="http://kevindemarco.com/assets/images/pair-ssh-diagram.jpg" alt="Pair SSH Diagram" /></p>
+
+<p>As shown in the diagram, the pair programming server is initiated by the host
+developer running the <code class="highlighter-rouge">wemux</code> command. The remote developer then uses SSH to
+log into the <code class="highlighter-rouge">pair</code> Linux user on the host machine. The pair user’s
+<code class="highlighter-rouge">~/.profile</code> file is configured to run the command, <code class="highlighter-rouge">wemux pair; exit</code>, which
+forces the remote user to immediately join the wemux session upon login and
+exit the SSH session when the wemux session ends. Finally, to make it easier to
+SSH into computers that are behind firewalls, proxies, and VPN servers, the
+host machine will use <code class="highlighter-rouge">ngrok</code> to provide an SSH tunnel (cf. <a href="https://ngrok.com/">ngrok</a>).</p>
+
+<h2 id="one-time-host-linux-machine-configuration">One-Time Host Linux Machine Configuration</h2>
+
+<h3 id="install-ssh-server-and-snap-package-manager">Install SSH server and snap package manager</h3>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo </span>apt-get <span class="nb">install </span>openssh-server snapd</code></pre></figure>
+
+<h3 id="install-the-ngrok-snap-package">Install the ngrok snap package</h3>
+
+<p><a href="https://ngrok.com/">ngrok</a> will be used to create an SSH tunnel to the host machine that
+can be securely accessed behind firewalls and VPN servers.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo </span>snap <span class="nb">install </span>ngrok</code></pre></figure>
+
+<h4 id="configure-ngrok">Configure ngrok</h4>
+
+<p>Create an ngrok account:
+<a href="https://dashboard.ngrok.com/login">https://dashboard.ngrok.com/login</a></p>
+
+<p>After creating your ngrok account, you will need to use the tunnel
+authorization token in your ngrok account to authorize your machine. Copy the
+authorization token from the website,
+<a href="https://dashboard.ngrok.com/auth">https://dashboard.ngrok.com/auth</a>, and run
+the following command, where <code class="highlighter-rouge">&lt;authorization-token&gt;</code> is the copied token:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ngrok authtoken &lt;authorization-token&gt;</code></pre></figure>
+
+<h3 id="install-and-configure-wemux">Install and Configure wemux</h3>
+
+<p><a href="https://github.com/zolrath/wemux">wemux</a> is a project that allows multiple
+developers to directly collaborate on the same command line. (wemux leverages
+<a href="https://github.com/tmux/tmux">tmux</a>.) First, clone the wemux project to a
+local directory. Typically, I keep 3rd-party repositories in a separate
+directory:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">mkdir</span> <span class="nt">-p</span> ~/repos/3rd-party
+<span class="nv">$ </span><span class="nb">cd</span> ~/repos/3rd-party
+<span class="nv">$ </span>git clone https://github.com/zolrath/wemux.git</code></pre></figure>
+
+<p>Now, configure wemux to only allow the host user to start a wemux session:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cd </span>wemux
+<span class="nv">$ </span><span class="nb">echo</span> <span class="s2">"host_list=(</span><span class="k">${</span><span class="nv">USER</span><span class="k">}</span><span class="s2">)"</span> <span class="o">&gt;&gt;</span> ./wemux.conf.example</code></pre></figure>
+
+<p>Symbolically link the <code class="highlighter-rouge">wemux</code> executable to a directory that is on the system
+<code class="highlighter-rouge">$PATH</code> and link the configuration file to the default location (you will need
+to run the following commands with <code class="highlighter-rouge">sudo</code>):</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo ln</span> <span class="nt">-s</span> <span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/wemux /usr/local/bin/wemux <span class="o">&amp;&amp;</span> <span class="se">\</span>
+  <span class="nb">sudo ln</span> <span class="nt">-s</span> <span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/wemux.conf.example /usr/local/etc/wemux.conf</code></pre></figure>
+
+<h3 id="create-a-new-linux-user">Create a new Linux User</h3>
+
+<p>We will create a new Linux user, called <code class="highlighter-rouge">pair</code>, that will only be used by
+remote pair programming users. You can accept the default values when running
+the <code class="highlighter-rouge">adduser</code> command, but make sure you specify a non-trivial password for the
+new user.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo </span>adduser pair</code></pre></figure>
+
+<p>Now that the user has been created, let’s modify the user’s <code class="highlighter-rouge">~/.profile</code> file
+such that when the remote user logs in, they are immediately dropped into the
+currently running <code class="highlighter-rouge">wemux</code> session.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo</span> /bin/bash <span class="nt">-c</span> <span class="s2">"printf </span><span class="se">\"</span><span class="s2">wemux pair</span><span class="se">\n</span><span class="s2">exit</span><span class="se">\n\"</span><span class="s2"> &gt;&gt; /home/pair/.profile"</span></code></pre></figure>
+
+<p>If the remote user tries to log into the <code class="highlighter-rouge">pair</code> user and the host isn’t running
+<code class="highlighter-rouge">wemux</code>, then the user’s SSH session is immediately terminated. Through this
+mechanism, the host developer specifies when the remote user can access the
+<code class="highlighter-rouge">pair</code> user. Also, the <code class="highlighter-rouge">exit</code> command terminates the <code class="highlighter-rouge">pair</code> user’s session
+when the <code class="highlighter-rouge">wemux</code> session ends.</p>
+
+<p>For additional security, let’s configure the SSH server such that the <code class="highlighter-rouge">pair</code>
+user can’t login with a password and restart the SSH server:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo</span> /bin/bash <span class="nt">-c</span> <span class="s2">"printf </span><span class="se">\"</span><span class="s2">Match User pair</span><span class="se">\n</span><span class="s2">    PasswordAuthentication no</span><span class="se">\n\"</span><span class="s2"> &gt;&gt; /etc/ssh/sshd_config"</span>
+<span class="nv">$ </span><span class="nb">sudo </span>service ssh restart</code></pre></figure>
+
+<h2 id="host-machine-session-initiation">Host Machine Session Initiation</h2>
+
+<p>The following are the typical steps required when initiating a new pair
+programming session.</p>
+
+<h3 id="enable-ssh-login-via-publicprivate-key-authentication">Enable SSH Login via Public/Private Key Authentication</h3>
+
+<p>The remote user will log into the <code class="highlighter-rouge">pair</code> user, but we don’t want the remote
+user to have to know the password for the <code class="highlighter-rouge">pair</code> user, so we will use
+public/private key authentication for SSH login. The remote user needs to send
+their public key (typically located at <code class="highlighter-rouge">~/.ssh/id_rsa.pub</code>) to the host
+developer. If the remote developer hasn’t generated SSH keys yet, the remote
+user should generate SSH keys with the following command (substituting a valid
+e-mail address):</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ssh-keygen <span class="nt">-t</span> rsa <span class="nt">-b</span> 4096 <span class="nt">-C</span> <span class="s2">"your_email@example.com"</span></code></pre></figure>
+
+<p>The <code class="highlighter-rouge">id_rsa.pub</code> file can be transferred to the host developer via e-mail,
+chat, etc. Upon reception of <code class="highlighter-rouge">id_rsa.pub</code>, the host developer can add the
+public key to the <code class="highlighter-rouge">pair</code> user’s <code class="highlighter-rouge">authorized_keys</code> file to enable password-less
+SSH login:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo</span> /bin/bash <span class="nt">-c</span> <span class="s2">"cat id_rsa.pub &gt;&gt; /home/pair/.ssh/authorized_keys"</span></code></pre></figure>
+
+<h3 id="expose-ssh-port-via-ngrok">Expose SSH Port via ngrok</h3>
+
+<p>The host developer will now use the <code class="highlighter-rouge">ngrok</code> command to expose port 22 of the
+SSH server:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ngrok tcp 22</code></pre></figure>
+
+<p>The ngrok connection information will be printed to the screen. Note the
+information in the “Forwarding” section as this will be sent to the remote
+developer to access the host’s SSH server. For example, if the “Forwarding”
+section contained the following information:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">Forwarding                    tcp://0.tcp.ngrok.io:14242 -&gt; localhost:22</code></pre></figure>
+
+<p>The remote user would use the following SSH command to log into the host’s
+machine (the <code class="highlighter-rouge">-p</code> flag specifies the SSH port):</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ssh <span class="nt">-p</span> 14242 pair@0.tcp.ngrok.io</code></pre></figure>
+
+<h3 id="start-wemux-host-session">Start wemux Host Session</h3>
+
+<p>The remote developer will not be able to log into the <code class="highlighter-rouge">pair</code> user until the
+host developer starts the wemux session in a separate terminal:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>wemux</code></pre></figure>
+
+<p>At this point, the remote developer can run the previously shown SSH
+command. When, the host exits the wemux session, both users will be removed
+from the session and the remote user will be logged off.</p>
+
+<h2 id="configuration-options">Configuration Options</h2>
+
+<h3 id="wemux-options">wemux options</h3>
+
+<p>If you don’t want the remote user to be able to enter commands, you can force
+the remote user into the “mirror” mode by changing <code class="highlighter-rouge">wemux pair</code> to <code class="highlighter-rouge">wemux
+mirror</code> in the <code class="highlighter-rouge">~/.profile</code> file.</p>
+
+<h2 id="other-notes">Other Notes</h2>
+
+<p>After you modify the <code class="highlighter-rouge">pair</code> user’s <code class="highlighter-rouge">~/.profile</code> file, you won’t be able to
+easily log into <code class="highlighter-rouge">pair</code> user with the normal <code class="highlighter-rouge">su pair</code> command without having to
+start the wemux server. Instead, you can just directly modify the user’s
+configuration files by prefixing your editor call with <code class="highlighter-rouge">sudo</code>:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo </span>nano /home/pair/.profile</code></pre></figure>
+
+<h2 id="references">References</h2>
+
+<p>The following blog posts were used to put together this post:</p>
+<ul>
+  <li><a href="https://brianschiller.com/blog/2014/07/18/pair-programming-wemux">Pair Programming with wemux and ngrok</a></li>
+  <li><a href="http://martinbrochhaus.com/pair.html">Pair Programming With Tmux</a></li>
+  <li><a href="https://www.hamvocke.com/blog/remote-pair-programming-with-tmux/">Remote Pair Programming Made Easy with SSH and tmux</a></li>
+  <li><a href="https://ryanlue.com/posts/2018-01-13-pair-programming-over-ssh">ssh + tmux = Pair Programming for Command Line Junkies</a></li>
+</ul>
+
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2020-03-25T23:11:13-04:00">March 25, 2020</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?via=syllogismrxs&text=Remote+Pair+Programming+via+SSH+and+wemux+on+Linux%20http%3A%2F%2Fkevindemarco.com%2Fssh%2Fprogramming%2Fngrok%2Ftmux%2Fwemux%2Fterminal%2F2020%2F03%2F25%2Fpair-programming.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fkevindemarco.com%2Fssh%2Fprogramming%2Fngrok%2Ftmux%2Fwemux%2Fterminal%2F2020%2F03%2F25%2Fpair-programming.html" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Fkevindemarco.com%2Fssh%2Fprogramming%2Fngrok%2Ftmux%2Fwemux%2Fterminal%2F2020%2F03%2F25%2Fpair-programming.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+    </div>
+
+    
+      <div class="page__comments">
+  
+  
+      <h4 class="page__comments-title">Comments</h4>
+      <section id="disqus_thread"></section>
+    
+</div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+            
+      </div>
+    </div>
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2020 Kevin DeMarco. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-23277342-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-23277342-1', { 'anonymize_ip': false});
+</script>
+
+
+
+
+
+
+    
+  <script>
+    var disqus_config = function () {
+      this.page.url = "http://kevindemarco.com/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming.html";  /* Replace PAGE_URL with your page's canonical URL variable */
+      this.page.identifier = "/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming"; /* Replace PAGE_IDENTIFIER with your page's unique identifier variable */
+    };
+    (function() { /* DON'T EDIT BELOW THIS LINE */
+      var d = document, s = d.createElement('script');
+      s.src = 'https://demarco.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+
+
+
+
+
+  </body>
+</html>

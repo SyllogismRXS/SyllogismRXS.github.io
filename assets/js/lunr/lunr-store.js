@@ -1,6 +1,7 @@
 var store = [{
-        "title": "Welcome to Jekyll!",
-        "excerpt":"You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run jekyll serve, which launches a web server and auto-regenerates your site when...","categories": ["jekyll","update"],
+        "title": "Remote Pair Programming via SSH and wemux on Linux",
+        "excerpt":"There are several benefits to the use of pair programming in the software development process: fewer mistakes, better understanding of the codebase across multiple developers, and improved team cohesiveness (cf. The Pros and Cons of Pair Programming). Personally, I have found pair programming can be especially useful for training. Experienced...","categories": ["ssh","programming","ngrok","tmux","wemux","terminal"],
         "tags": [],
-        "url": "http://kevindemarco.com/jekyll/update/2019/06/05/welcome-to-jekyll.html",
-        "teaser":null}]
+        "url": "http://kevindemarco.com/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming.html",
+        "teaser": null
+      }]

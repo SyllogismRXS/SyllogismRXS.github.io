@@ -1,13 +1,194 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="http://kevindemarco.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://kevindemarco.com/" rel="alternate" type="text/html" /><updated>2019-08-06T17:13:17-04:00</updated><id>http://kevindemarco.com/feed.xml</id><title type="html">Kevin DeMarco</title><subtitle>I write about robotics, technology, music, and bicycling. </subtitle><author><name>Kevin DeMarco</name></author><entry><title type="html">Welcome to Jekyll!</title><link href="http://kevindemarco.com/jekyll/update/2019/06/05/welcome-to-jekyll.html" rel="alternate" type="text/html" title="Welcome to Jekyll!" /><published>2019-06-05T23:11:13-04:00</published><updated>2019-06-05T23:11:13-04:00</updated><id>http://kevindemarco.com/jekyll/update/2019/06/05/welcome-to-jekyll</id><content type="html" xml:base="http://kevindemarco.com/jekyll/update/2019/06/05/welcome-to-jekyll.html">&lt;p&gt;You’ll find this post in your &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run &lt;code class=&quot;highlighter-rouge&quot;&gt;jekyll serve&lt;/code&gt;, which launches a web server and auto-regenerates your site when a file is updated.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://kevindemarco.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://kevindemarco.com/" rel="alternate" type="text/html" /><updated>2020-03-30T17:28:51-04:00</updated><id>http://kevindemarco.com/feed.xml</id><title type="html">Kevin DeMarco</title><subtitle>I write about robotics, technology, music, and bicycling. </subtitle><author><name>Kevin DeMarco</name></author><entry><title type="html">Remote Pair Programming via SSH and wemux on Linux</title><link href="http://kevindemarco.com/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming.html" rel="alternate" type="text/html" title="Remote Pair Programming via SSH and wemux on Linux" /><published>2020-03-25T23:11:13-04:00</published><updated>2020-03-25T23:11:13-04:00</updated><id>http://kevindemarco.com/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming</id><content type="html" xml:base="http://kevindemarco.com/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming.html">&lt;p&gt;There are several benefits to the use of pair programming in the software
+development process: fewer mistakes, better understanding of the codebase
+across multiple developers, and improved team cohesiveness (cf. &lt;a href=&quot;https://www.verypossible.com/blog/pros-and-cons-of-pair-programming&quot;&gt;The Pros and
+Cons of Pair Programming&lt;/a&gt;). Personally,
+I have found pair programming can be especially useful for
+training. Experienced developers forget the multitude of tiny stumbling blocks
+that less experienced developers encounter on a daily basis. Also, it can be
+helpful for less experienced developers to see how experienced developers have
+customized their tools for increased productivity (e.g., terminal setup, emacs
+config, vim config, etc.)&lt;/p&gt;
 
-&lt;p&gt;To add new posts, simply add a file in the &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory that follows the convention &lt;code class=&quot;highlighter-rouge&quot;&gt;YYYY-MM-DD-name-of-post.ext&lt;/code&gt; and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.&lt;/p&gt;
+&lt;p&gt;However, when working remotely, pair programming can be difficult without a
+simple and secure process. In this post, I describe the steps required to setup
+a secure pair programming process in which one (remote) developer SSH’s into
+another (host) developer’s Linux machine. The host developer will be able to
+specify which remote developers have access and also see the command line
+keyboard entries made by the remote developer. We will also configure the host
+machine such that the remote user will not be able to SSH into the host machine
+unless the host developer runs a specific terminal sharing program (i.e.,
+wemux). While this setup is fairly secure, you shouldn’t grant access to remote
+developers that you don’t trust.&lt;/p&gt;
 
-&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
+&lt;h2 id=&quot;system-overview&quot;&gt;System Overview&lt;/h2&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Hi, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Tom'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;#=&amp;gt; prints 'Hi, Tom' to STDOUT.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;A high-level diagram of the setup is shown in the following figure.&lt;/p&gt;
 
-&lt;p&gt;Check out the &lt;a href=&quot;https://jekyllrb.com/docs/home&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://talk.jekyllrb.com/&quot;&gt;Jekyll Talk&lt;/a&gt;.&lt;/p&gt;</content><author><name>Kevin DeMarco</name></author><summary type="html">You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run jekyll serve, which launches a web server and auto-regenerates your site when a file is updated.</summary></entry></feed>
+&lt;p&gt;&lt;img src=&quot;http://kevindemarco.com/assets/images/pair-ssh-diagram.jpg&quot; alt=&quot;Pair SSH Diagram&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As shown in the diagram, the pair programming server is initiated by the host
+developer running the &lt;code class=&quot;highlighter-rouge&quot;&gt;wemux&lt;/code&gt; command. The remote developer then uses SSH to
+log into the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; Linux user on the host machine. The pair user’s
+&lt;code class=&quot;highlighter-rouge&quot;&gt;~/.profile&lt;/code&gt; file is configured to run the command, &lt;code class=&quot;highlighter-rouge&quot;&gt;wemux pair; exit&lt;/code&gt;, which
+forces the remote user to immediately join the wemux session upon login and
+exit the SSH session when the wemux session ends. Finally, to make it easier to
+SSH into computers that are behind firewalls, proxies, and VPN servers, the
+host machine will use &lt;code class=&quot;highlighter-rouge&quot;&gt;ngrok&lt;/code&gt; to provide an SSH tunnel (cf. &lt;a href=&quot;https://ngrok.com/&quot;&gt;ngrok&lt;/a&gt;).&lt;/p&gt;
+
+&lt;h2 id=&quot;one-time-host-linux-machine-configuration&quot;&gt;One-Time Host Linux Machine Configuration&lt;/h2&gt;
+
+&lt;h3 id=&quot;install-ssh-server-and-snap-package-manager&quot;&gt;Install SSH server and snap package manager&lt;/h3&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;openssh-server snapd&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;install-the-ngrok-snap-package&quot;&gt;Install the ngrok snap package&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://ngrok.com/&quot;&gt;ngrok&lt;/a&gt; will be used to create an SSH tunnel to the host machine that
+can be securely accessed behind firewalls and VPN servers.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;snap &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;ngrok&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h4 id=&quot;configure-ngrok&quot;&gt;Configure ngrok&lt;/h4&gt;
+
+&lt;p&gt;Create an ngrok account:
+&lt;a href=&quot;https://dashboard.ngrok.com/login&quot;&gt;https://dashboard.ngrok.com/login&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;After creating your ngrok account, you will need to use the tunnel
+authorization token in your ngrok account to authorize your machine. Copy the
+authorization token from the website,
+&lt;a href=&quot;https://dashboard.ngrok.com/auth&quot;&gt;https://dashboard.ngrok.com/auth&lt;/a&gt;, and run
+the following command, where &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;authorization-token&amp;gt;&lt;/code&gt; is the copied token:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ngrok authtoken &amp;lt;authorization-token&amp;gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;install-and-configure-wemux&quot;&gt;Install and Configure wemux&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/zolrath/wemux&quot;&gt;wemux&lt;/a&gt; is a project that allows multiple
+developers to directly collaborate on the same command line. (wemux leverages
+&lt;a href=&quot;https://github.com/tmux/tmux&quot;&gt;tmux&lt;/a&gt;.) First, clone the wemux project to a
+local directory. Typically, I keep 3rd-party repositories in a separate
+directory:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; ~/repos/3rd-party
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ~/repos/3rd-party
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git clone https://github.com/zolrath/wemux.git&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Now, configure wemux to only allow the host user to start a wemux session:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;wemux
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;host_list=(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;USER&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; ./wemux.conf.example&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Symbolically link the &lt;code class=&quot;highlighter-rouge&quot;&gt;wemux&lt;/code&gt; executable to a directory that is on the system
+&lt;code class=&quot;highlighter-rouge&quot;&gt;$PATH&lt;/code&gt; and link the configuration file to the default location (you will need
+to run the following commands with &lt;code class=&quot;highlighter-rouge&quot;&gt;sudo&lt;/code&gt;):&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo ln&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/wemux /usr/local/bin/wemux &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;sudo ln&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/wemux.conf.example /usr/local/etc/wemux.conf&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;create-a-new-linux-user&quot;&gt;Create a new Linux User&lt;/h3&gt;
+
+&lt;p&gt;We will create a new Linux user, called &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt;, that will only be used by
+remote pair programming users. You can accept the default values when running
+the &lt;code class=&quot;highlighter-rouge&quot;&gt;adduser&lt;/code&gt; command, but make sure you specify a non-trivial password for the
+new user.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;adduser pair&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Now that the user has been created, let’s modify the user’s &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.profile&lt;/code&gt; file
+such that when the remote user logs in, they are immediately dropped into the
+currently running &lt;code class=&quot;highlighter-rouge&quot;&gt;wemux&lt;/code&gt; session.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo&lt;/span&gt; /bin/bash &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;printf &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;wemux pair&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;exit&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; &amp;gt;&amp;gt; /home/pair/.profile&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;If the remote user tries to log into the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user and the host isn’t running
+&lt;code class=&quot;highlighter-rouge&quot;&gt;wemux&lt;/code&gt;, then the user’s SSH session is immediately terminated. Through this
+mechanism, the host developer specifies when the remote user can access the
+&lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user. Also, the &lt;code class=&quot;highlighter-rouge&quot;&gt;exit&lt;/code&gt; command terminates the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user’s session
+when the &lt;code class=&quot;highlighter-rouge&quot;&gt;wemux&lt;/code&gt; session ends.&lt;/p&gt;
+
+&lt;p&gt;For additional security, let’s configure the SSH server such that the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt;
+user can’t login with a password and restart the SSH server:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo&lt;/span&gt; /bin/bash &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;printf &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Match User pair&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;    PasswordAuthentication no&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; &amp;gt;&amp;gt; /etc/ssh/sshd_config&quot;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;service ssh restart&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2 id=&quot;host-machine-session-initiation&quot;&gt;Host Machine Session Initiation&lt;/h2&gt;
+
+&lt;p&gt;The following are the typical steps required when initiating a new pair
+programming session.&lt;/p&gt;
+
+&lt;h3 id=&quot;enable-ssh-login-via-publicprivate-key-authentication&quot;&gt;Enable SSH Login via Public/Private Key Authentication&lt;/h3&gt;
+
+&lt;p&gt;The remote user will log into the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user, but we don’t want the remote
+user to have to know the password for the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user, so we will use
+public/private key authentication for SSH login. The remote user needs to send
+their public key (typically located at &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.ssh/id_rsa.pub&lt;/code&gt;) to the host
+developer. If the remote developer hasn’t generated SSH keys yet, the remote
+user should generate SSH keys with the following command (substituting a valid
+e-mail address):&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ssh-keygen &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; rsa &lt;span class=&quot;nt&quot;&gt;-b&lt;/span&gt; 4096 &lt;span class=&quot;nt&quot;&gt;-C&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;your_email@example.com&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;id_rsa.pub&lt;/code&gt; file can be transferred to the host developer via e-mail,
+chat, etc. Upon reception of &lt;code class=&quot;highlighter-rouge&quot;&gt;id_rsa.pub&lt;/code&gt;, the host developer can add the
+public key to the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user’s &lt;code class=&quot;highlighter-rouge&quot;&gt;authorized_keys&lt;/code&gt; file to enable password-less
+SSH login:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo&lt;/span&gt; /bin/bash &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;cat id_rsa.pub &amp;gt;&amp;gt; /home/pair/.ssh/authorized_keys&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;expose-ssh-port-via-ngrok&quot;&gt;Expose SSH Port via ngrok&lt;/h3&gt;
+
+&lt;p&gt;The host developer will now use the &lt;code class=&quot;highlighter-rouge&quot;&gt;ngrok&lt;/code&gt; command to expose port 22 of the
+SSH server:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ngrok tcp 22&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The ngrok connection information will be printed to the screen. Note the
+information in the “Forwarding” section as this will be sent to the remote
+developer to access the host’s SSH server. For example, if the “Forwarding”
+section contained the following information:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;Forwarding                    tcp://0.tcp.ngrok.io:14242 -&amp;gt; localhost:22&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The remote user would use the following SSH command to log into the host’s
+machine (the &lt;code class=&quot;highlighter-rouge&quot;&gt;-p&lt;/code&gt; flag specifies the SSH port):&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ssh &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 14242 pair@0.tcp.ngrok.io&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;start-wemux-host-session&quot;&gt;Start wemux Host Session&lt;/h3&gt;
+
+&lt;p&gt;The remote developer will not be able to log into the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user until the
+host developer starts the wemux session in a separate terminal:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;wemux&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;At this point, the remote developer can run the previously shown SSH
+command. When, the host exits the wemux session, both users will be removed
+from the session and the remote user will be logged off.&lt;/p&gt;
+
+&lt;h2 id=&quot;configuration-options&quot;&gt;Configuration Options&lt;/h2&gt;
+
+&lt;h3 id=&quot;wemux-options&quot;&gt;wemux options&lt;/h3&gt;
+
+&lt;p&gt;If you don’t want the remote user to be able to enter commands, you can force
+the remote user into the “mirror” mode by changing &lt;code class=&quot;highlighter-rouge&quot;&gt;wemux pair&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;wemux
+mirror&lt;/code&gt; in the &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.profile&lt;/code&gt; file.&lt;/p&gt;
+
+&lt;h2 id=&quot;other-notes&quot;&gt;Other Notes&lt;/h2&gt;
+
+&lt;p&gt;After you modify the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user’s &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.profile&lt;/code&gt; file, you won’t be able to
+easily log into &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user with the normal &lt;code class=&quot;highlighter-rouge&quot;&gt;su pair&lt;/code&gt; command without having to
+start the wemux server. Instead, you can just directly modify the user’s
+configuration files by prefixing your editor call with &lt;code class=&quot;highlighter-rouge&quot;&gt;sudo&lt;/code&gt;:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;nano /home/pair/.profile&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;p&gt;The following blog posts were used to put together this post:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://brianschiller.com/blog/2014/07/18/pair-programming-wemux&quot;&gt;Pair Programming with wemux and ngrok&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://martinbrochhaus.com/pair.html&quot;&gt;Pair Programming With Tmux&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.hamvocke.com/blog/remote-pair-programming-with-tmux/&quot;&gt;Remote Pair Programming Made Easy with SSH and tmux&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://ryanlue.com/posts/2018-01-13-pair-programming-over-ssh&quot;&gt;ssh + tmux = Pair Programming for Command Line Junkies&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Kevin DeMarco</name></author><summary type="html">There are several benefits to the use of pair programming in the software development process: fewer mistakes, better understanding of the codebase across multiple developers, and improved team cohesiveness (cf. The Pros and Cons of Pair Programming). Personally, I have found pair programming can be especially useful for training. Experienced developers forget the multitude of tiny stumbling blocks that less experienced developers encounter on a daily basis. Also, it can be helpful for less experienced developers to see how experienced developers have customized their tools for increased productivity (e.g., terminal setup, emacs config, vim config, etc.)</summary></entry></feed>
