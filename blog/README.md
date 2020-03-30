@@ -26,6 +26,7 @@ The static pages need to be pushed to the "master" branch to be served by GitHub
 
     $ cd ../
     $ git checkout master
-    $ cp -r ./blog/_site .
+    $ git pull origin master
+    $ cp -r ./blog/_site/* .
     $ git commit -a -m "some message"
     $ git push origin master
