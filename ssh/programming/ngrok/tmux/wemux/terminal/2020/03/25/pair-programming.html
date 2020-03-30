@@ -302,7 +302,7 @@
 
 
 
-  5 minute read
+  6 minute read
 
 </p>
           
@@ -350,9 +350,12 @@ host machine will use <code class="highlighter-rouge">ngrok</code> to provide an
 
 <h2 id="one-time-host-linux-machine-configuration">One-Time Host Linux Machine Configuration</h2>
 
-<h3 id="install-ssh-server-and-snap-package-manager">Install SSH server and snap package manager</h3>
+<h3 id="install-package-dependencies">Install Package Dependencies</h3>
 
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo </span>apt-get <span class="nb">install </span>openssh-server snapd</code></pre></figure>
+<p>Install the SSH server, tmux, and the snap package manager with your system’s
+package manager:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo </span>apt-get <span class="nb">install </span>openssh-server tmux snapd</code></pre></figure>
 
 <h3 id="install-the-ngrok-snap-package">Install the ngrok snap package</h3>
 
