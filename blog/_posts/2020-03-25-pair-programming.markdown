@@ -131,8 +131,15 @@ mechanism, the host developer specifies when the remote user can access the
 `pair` user. Also, the `exit` command terminates the `pair` user's session
 when the `wemux` session ends.
 
+To hold the public keys from remote developers, let's create the
+`authorized_keys` file for the `pair` user:
+
+{% highlight bash %}
+$ sudo /bin/bash -c "mkdir -p /home/pair/.ssh && touch /home/pair/.ssh/authorized_keys"
+{% endhighlight %}
+
 For additional security, let's configure the SSH server such that the `pair`
-user can't login with a password and restart the SSH server:
+user can't login with a password and then we'll restart the SSH server:
 
 {% highlight bash %}
 $ sudo /bin/bash -c "printf \"Match User pair\n    PasswordAuthentication no\n\" >> /etc/ssh/sshd_config"
