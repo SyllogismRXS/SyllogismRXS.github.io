@@ -422,8 +422,13 @@ mechanism, the host developer specifies when the remote user can access the
 <code class="highlighter-rouge">pair</code> user. Also, the <code class="highlighter-rouge">exit</code> command terminates the <code class="highlighter-rouge">pair</code> user’s session
 when the <code class="highlighter-rouge">wemux</code> session ends.</p>
 
+<p>To hold the public keys from remote developers, let’s create the
+<code class="highlighter-rouge">authorized_keys</code> file for the <code class="highlighter-rouge">pair</code> user:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo</span> /bin/bash <span class="nt">-c</span> <span class="s2">"mkdir -p /home/pair/.ssh &amp;&amp; touch /home/pair/.ssh/authorized_keys"</span></code></pre></figure>
+
 <p>For additional security, let’s configure the SSH server such that the <code class="highlighter-rouge">pair</code>
-user can’t login with a password and restart the SSH server:</p>
+user can’t login with a password and then we’ll restart the SSH server:</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo</span> /bin/bash <span class="nt">-c</span> <span class="s2">"printf </span><span class="se">\"</span><span class="s2">Match User pair</span><span class="se">\n</span><span class="s2">    PasswordAuthentication no</span><span class="se">\n\"</span><span class="s2"> &gt;&gt; /etc/ssh/sshd_config"</span>
 <span class="nv">$ </span><span class="nb">sudo </span>service ssh restart</code></pre></figure>
