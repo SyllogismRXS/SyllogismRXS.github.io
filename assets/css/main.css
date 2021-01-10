@@ -18,8 +18,8 @@
   color: inherit; }
 
 /*!
- * Minimal Mistakes Jekyll Theme 4.19.1 by Michael Rose
- * Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+ * Minimal Mistakes Jekyll Theme 4.21.0 by Michael Rose
+ * Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
  * Licensed under MIT (https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE)
 */
 /* Variables */
@@ -1443,7 +1443,8 @@ th {
   .notice h4 {
     margin-top: 0 !important;
     /* override*/
-    margin-bottom: 0.75em; }
+    margin-bottom: 0.75em;
+    line-height: inherit; }
   .page__content .notice h4 {
     /* using at-root to override .page-content h4 font size*/
     margin-bottom: 0;
@@ -1483,7 +1484,8 @@ th {
   .notice--primary h4 {
     margin-top: 0 !important;
     /* override*/
-    margin-bottom: 0.75em; }
+    margin-bottom: 0.75em;
+    line-height: inherit; }
   .page__content .notice--primary h4 {
     /* using at-root to override .page-content h4 font size*/
     margin-bottom: 0;
@@ -1523,7 +1525,8 @@ th {
   .notice--info h4 {
     margin-top: 0 !important;
     /* override*/
-    margin-bottom: 0.75em; }
+    margin-bottom: 0.75em;
+    line-height: inherit; }
   .page__content .notice--info h4 {
     /* using at-root to override .page-content h4 font size*/
     margin-bottom: 0;
@@ -1563,7 +1566,8 @@ th {
   .notice--warning h4 {
     margin-top: 0 !important;
     /* override*/
-    margin-bottom: 0.75em; }
+    margin-bottom: 0.75em;
+    line-height: inherit; }
   .page__content .notice--warning h4 {
     /* using at-root to override .page-content h4 font size*/
     margin-bottom: 0;
@@ -1603,7 +1607,8 @@ th {
   .notice--success h4 {
     margin-top: 0 !important;
     /* override*/
-    margin-bottom: 0.75em; }
+    margin-bottom: 0.75em;
+    line-height: inherit; }
   .page__content .notice--success h4 {
     /* using at-root to override .page-content h4 font size*/
     margin-bottom: 0;
@@ -1643,7 +1648,8 @@ th {
   .notice--danger h4 {
     margin-top: 0 !important;
     /* override*/
-    margin-bottom: 0.75em; }
+    margin-bottom: 0.75em;
+    line-height: inherit; }
   .page__content .notice--danger h4 {
     /* using at-root to override .page-content h4 font size*/
     margin-bottom: 0;
@@ -1890,7 +1896,9 @@ th {
     display: block;
     margin: 0 1rem;
     color: #000;
-    text-decoration: none; }
+    text-decoration: none;
+    -webkit-transition: none;
+    transition: none; }
     .greedy-nav a:hover {
       color: #000; }
     .greedy-nav a.site-logo {
@@ -1898,6 +1906,9 @@ th {
       margin-right: 0.5rem; }
     .greedy-nav a.site-title {
       margin-left: 0; }
+  .greedy-nav img {
+    -webkit-transition: none;
+    transition: none; }
   .greedy-nav__toggle {
     -ms-flex-item-align: center;
     align-self: center;
@@ -2176,7 +2187,6 @@ th {
   margin-left: 0;
   margin-right: 0;
   width: 100%;
-  clear: both;
   margin-top: 3em;
   color: #000;
   -webkit-animation: intro 0.3s both;
@@ -3240,6 +3250,11 @@ body {
   font-size: 0.75em;
   text-transform: uppercase; }
 
+.page__meta-sep::before {
+  content: "\2022";
+  padding-left: 0.5em;
+  padding-right: 0.5em; }
+
 /*
    Page taxonomy
    ========================================================================== */
@@ -3460,7 +3475,7 @@ body {
     position: static; }
 
 .archive__subtitle {
-  margin: 1.414em 0 0;
+  margin: 1.414em 0 0.5em;
   padding-bottom: 0.5em;
   font-size: 1em;
   color: #000;
@@ -3579,6 +3594,10 @@ body {
   .grid__item .page__meta, .grid__item .comment__date {
     margin: 0 0 4px;
     font-size: 0.6em; }
+  .grid__item .page__meta-sep {
+    display: block; }
+    .grid__item .page__meta-sep::before {
+      display: none; }
   .grid__item .archive__item-title {
     margin-top: 0.5em;
     font-size: 1em; }
@@ -3778,7 +3797,7 @@ body {
         /* calculate height of nav list
            viewport height - nav height - masthead x-padding
         */
-        height: calc(100vh - 2em - 2em); } }
+        max-height: calc(100vh - 2em - 2em); } }
   @media (min-width: 80em) {
     .sidebar {
       width: calc(200px - 1em); } }
@@ -3898,11 +3917,12 @@ body {
   display: table-cell;
   vertical-align: middle;
   font-family: -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI", "Helvetica Neue", "Lucida Grande", Arial, sans-serif;
-  z-index: 10;
-  position: relative;
+  z-index: 20;
   cursor: pointer; }
   .author__urls-wrapper li:last-child a {
     margin-bottom: 0; }
+  .author__urls-wrapper .author__urls span.label {
+    padding-left: 5px; }
   @media (min-width: 64em) {
     .author__urls-wrapper {
       display: block; } }
