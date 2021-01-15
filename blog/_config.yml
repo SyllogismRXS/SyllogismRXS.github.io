@@ -16,7 +16,7 @@
 title: Kevin DeMarco
 email: kevin.demarco@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-  I write about robotics, technology, music, and bicycling. 
+  I write about robotics, technology, music, woodworking, and bicycling.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://kevindemarco.com" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: syllogismrxs
@@ -44,7 +44,7 @@ plugins:
 # minimal-mistakes-jekyll configuration
 paginate: 5
 include: ["_pages"]
-minimal_mistakes_skin: "contrast" #"default" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum" "sunrise"
+minimal_mistakes_skin: "air" #"default" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum" "sunrise"
 locale: "en-US"
 timezone: America/New_York
 name: "Kevin DeMarco"
@@ -62,7 +62,7 @@ defaults:
       read_time: true
       comments: true
       share: true
-      related: true      
+      related: true
   # _pages
   - scope:
       path: ""
@@ -125,4 +125,8 @@ footer:
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
       url: "https://twitter.com/syllogismrxs"
-      
+
+compress_html:
+  clippings: all
+  ignore:
+    envs: development  # disable compression in dev environment

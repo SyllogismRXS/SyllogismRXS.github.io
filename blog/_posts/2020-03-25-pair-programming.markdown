@@ -3,6 +3,8 @@ layout: single
 title:  "Remote Pair Programming via SSH and wemux on Linux"
 date:   2020-03-25 23:11:13 -0400
 categories: ssh programming ngrok tmux wemux terminal
+header:
+  teaser: "/assets/images/2020-03-25-pair-programming/teaser.png"
 ---
 
 There are several benefits to the use of pair programming in the software
@@ -31,7 +33,7 @@ developers that you don't trust.
 
 A high-level diagram of the setup is shown in the following figure.
 
-![Pair SSH Diagram]({{ site.url }}{{ site.baseurl }}/assets/images/pair-ssh-diagram.jpg)
+![Pair SSH Diagram]({{ site.url }}{{ site.baseurl }}/assets/images/2020-03-25-pair-programming/pair-ssh-diagram.jpg)
 
 As shown in the diagram, the pair programming server is initiated by the host
 developer running the `wemux` command. The remote developer then uses SSH to
