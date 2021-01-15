@@ -66,9 +66,7 @@ Build the production code.
 After building the production website, just copy the static pages to the
 "static-blog" directory and push to the master branch.
 
-    $ cd ../
-    $ git checkout master
-    $ git pull origin master
-    $ cp -r ./blog/_site/* .
+    $ cp -r _site/* ../../static-blog/
+    $ cd ../../static-blog
     $ git commit -a -m "some message"
     $ git push origin master

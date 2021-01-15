@@ -6,7 +6,7 @@ var store = [{
         "teaser": "https://kevindemarco.com/assets/images/2020-03-25-pair-programming/teaser.png"
       },{
         "title": "A Handcrafted Dovetail Box",
-        "excerpt":"              ","categories": ["woodworking","handtools","box"],
+        "excerpt":"My educational background is in Electrical and Computer Engineering with a strong bent towards Computer Science. This means that I spend most of my day typing on a computer, reading technical papers, designing systems, writing code, and communicating with team members. Even when I am designing mechanical systems for the...","categories": ["woodworking","handtools","box"],
         "tags": [],
         "url": "https://kevindemarco.com/woodworking/handtools/box/2021/01/15/dovetail-box.html",
         "teaser": "https://kevindemarco.com/assets/images/2021-01-15-dovetail-box/teaser.jpg"
