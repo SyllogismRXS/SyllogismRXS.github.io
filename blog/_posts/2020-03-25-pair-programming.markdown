@@ -4,7 +4,8 @@ title:  "Remote Pair Programming via SSH and wemux on Linux"
 date:   2020-03-25 23:11:13 -0400
 categories: ssh programming ngrok tmux wemux terminal
 header:
-  teaser: "/assets/images/2020-03-25-pair-programming/teaser.png"
+  teaser: /assets/images/2020-03-25-pair-programming/teaser.png
+  og_image: /assets/images/2020-03-25-pair-programming/teaser.png
 ---
 
 There are several benefits to the use of pair programming in the software
