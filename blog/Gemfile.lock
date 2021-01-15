@@ -13,7 +13,7 @@ GEM
       faraday-net_http (~> 1.0)
       multipart-post (>= 1.2, < 3)
       ruby2_keywords
-    faraday-net_http (1.0.0)
+    faraday-net_http (1.0.1)
     ffi (1.14.2)
     forwardable-extended (2.6.0)
     http_parser.rb (0.6.0)
@@ -49,7 +49,7 @@ GEM
       listen (~> 3.0)
     kramdown (1.17.0)
     liquid (4.0.3)
-    listen (3.4.0)
+    listen (3.4.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
     mercenary (0.3.6)
@@ -97,4 +97,4 @@ DEPENDENCIES
   tzinfo-data
 
 BUNDLED WITH
-   2.2.4
+   2.2.5

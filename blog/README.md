@@ -49,9 +49,6 @@ Start the web server to view the website
 Deploy
 ------
 
-    $ JEKYLL_ENV=production bundle exec jekyll build
-
-
 The static pages need to be pushed to the "master" branch to be served by
 GitHub. I use a separate git worktree to make this process easier.
 
@@ -61,12 +58,15 @@ Setup the git worktree:
     $ git checkout blog
     $ git worktree add ../static-blog master
 
+Build the production code.
+
+    $ cd /path/to/this/repo/blog
+    $ JEKYLL_ENV=production bundle exec jekyll build
+
 After building the production website, just copy the static pages to the
 "static-blog" directory and push to the master branch.
 
-    $ cd ../
-    $ git checkout master
-    $ git pull origin master
-    $ cp -r ./blog/_site/* .
+    $ cp -r _site/* ../../static-blog/
+    $ cd ../../static-blog
     $ git commit -a -m "some message"
     $ git push origin master

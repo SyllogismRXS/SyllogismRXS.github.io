@@ -19,9 +19,9 @@
         <a href="{{ post.url | relative_url }}" rel="permalink">{{ title }}</a>
       {% endif %}
       {% if include.type == "grid" or teaser %}
-      <div class="archive__item-teaser">
-        <img src="{{ teaser | relative_url }}" alt="">
-      </div>
+        <div class="archive__item-teaser">
+          <a href="{{ post.url | relative_url }}" rel="permalink"><img src="{{ teaser | relative_url }}" alt=""></a>
+        </div>
     {% endif %}
     </h2>
     {% include page__meta.html type=include.type %}
