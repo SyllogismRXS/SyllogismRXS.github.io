@@ -14,7 +14,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 title: Kevin DeMarco
-email: kevin.demarco@gmail.com
+email: kevin@kevindemarco.com
 description: >- # this means to ignore newlines until "baseurl:"
   I write about robotics, technology, music, woodworking, and bicycling.
 baseurl: "" # the subpath of your site, e.g. /blog
@@ -28,18 +28,20 @@ markdown: kramdown
 theme: minimal-mistakes-jekyll
 plugins:
   - jekyll-feed
+  - jekyll-email-protect
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
 # to override the default setting.
-# exclude:
-#   - Gemfile
-#   - Gemfile.lock
-#   - node_modules
-#   - vendor/bundle/
-#   - vendor/cache/
-#   - vendor/gems/
-#   - vendor/ruby/
+exclude:
+   - Gemfile
+   - Gemfile.lock
+   - node_modules
+   - vendor/bundle/
+   - vendor/cache/
+   - vendor/gems/
+   - vendor/ruby/
+   - deploy.sh
 
 # minimal-mistakes-jekyll configuration
 paginate: 5
@@ -103,6 +105,9 @@ author:
   bio      : "Roboticist"
   location : "Atlanta, GA, USA"
   links:
+    - label: "LinkedIn"
+      icon: "fab fa-fw fa-linkedin"
+      url: "https://www.linkedin.com/in/kevindemarco"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/SyllogismRXS"
