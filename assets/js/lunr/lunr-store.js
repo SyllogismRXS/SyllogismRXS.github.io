@@ -10,4 +10,10 @@ var store = [{
         "tags": [],
         "url": "https://kevindemarco.com/woodworking/handtools/box/2021/01/15/dovetail-box.html",
         "teaser": "https://kevindemarco.com/assets/images/2021-01-15-dovetail-box/teaser.jpg"
+      },{
+        "title": "Bamboomba: The sort of wooden robot.",
+        "excerpt":"What do you get when you cross a Roomba… with scrap wood? You get… Bamboomba! You might be wondering why Kevin, being the professional researcher who he is, decided to build a half-wooden monstrosity with an obsolete robot base. Didn’t Kevin go to college for thirteen years or something? Why...","categories": ["robotics","ROS","woodworking"],
+        "tags": [],
+        "url": "https://kevindemarco.com/robotics/ros/woodworking/2021/01/19/bamboomba-part-1.html",
+        "teaser": "https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/teaser.jpg"
       }]

@@ -1,0 +1,746 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.21.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Bamboomba: The sort of wooden robot. - Kevin DeMarco</title>
+<meta name="description" content="What do you get when you cross a Roomba…">
+
+
+  <meta name="author" content="Kevin DeMarco">
+  
+  <meta property="article:author" content="Kevin DeMarco">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Kevin DeMarco">
+<meta property="og:title" content="Bamboomba: The sort of wooden robot.">
+<meta property="og:url" content="https://kevindemarco.com/robotics/ros/woodworking/2021/01/19/bamboomba-part-1.html">
+
+
+  <meta property="og:description" content="What do you get when you cross a Roomba…">
+
+
+
+  <meta property="og:image" content="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/angle-view.jpg">
+
+
+
+  <meta name="twitter:site" content="@syllogismrxs">
+  <meta name="twitter:title" content="Bamboomba: The sort of wooden robot.">
+  <meta name="twitter:description" content="What do you get when you cross a Roomba…">
+  <meta name="twitter:url" content="https://kevindemarco.com/robotics/ros/woodworking/2021/01/19/bamboomba-part-1.html">
+
+  
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/angle-view.jpg">
+  
+
+  
+
+
+
+  <meta property="article:published_time" content="2021-01-19T11:00:00-05:00">
+
+
+
+
+
+
+<link rel="canonical" href="https://kevindemarco.com/robotics/ros/woodworking/2021/01/19/bamboomba-part-1.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Kevin DeMarco",
+      "url": "https://kevindemarco.com/",
+      "sameAs": ["https://twitter.com/syllogismrxs","https://instagram.com/syllogismrxs","https://www.linkedin.com/in/kevindemarco"]
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Kevin DeMarco Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          Kevin DeMarco
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/">Blog</a>
+            </li><li class="masthead__menu-item">
+              <a href="/publications">Publications</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about">About</a>
+            </li><li class="masthead__menu-item">
+              <a href="/contact">Contact</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+  
+
+
+
+
+
+
+
+<div class="page__hero"
+  style=" background-image: url('');"
+>
+  
+    <img src="/assets/images/2021-01-19-bamboomba-part-1/header.jpg" alt="Bamboomba: The sort of wooden robot." class="page__hero-image">
+  
+  
+</div>
+
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/biking-face.jpg" alt="Kevin DeMarco" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Kevin DeMarco</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Roboticist</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Atlanta, GA, USA</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://www.linkedin.com/in/kevindemarco" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span></a></li>
+          
+        
+          
+            <li><a href="https://github.com/SyllogismRXS" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://instagram.com/syllogismrxs" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-instagram" aria-hidden="true"></i><span class="label">Instagram</span></a></li>
+          
+        
+          
+            <li><a href="https://twitter.com/syllogismrxs" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Bamboomba: The sort of wooden robot.">
+    <meta itemprop="description" content="What do you get when you cross a Roomba…">
+    <meta itemprop="datePublished" content="2021-01-19T11:00:00-05:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Bamboomba: The sort of wooden robot.
+</h1>
+          
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>What do you get when you cross a Roomba…</p>
+
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/apart_roomba.jpg" alt="Apart Roomba" /></p>
+
+<p>with scrap wood?</p>
+
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/scroll-saw-wood.jpg" alt="Wood with scroll saw" /></p>
+
+<p>You get… Bamboomba!</p>
+
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/bamboomba.jpg" alt="Bamboomba" /></p>
+
+<p>You might be wondering why Kevin, being the professional researcher who he is,
+decided to build a half-wooden monstrosity with an obsolete robot base.  Didn’t
+Kevin go to college for thirteen years or something? Why don’t you just <em>buy</em> a
+robot, Kevin? How is this robot going to help you pay your mortgage? Kevin.</p>
+
+<p>Jeeeeeez, stop hassling me. I built Bamboomba to show what is possible with a
+couple of low-cost sensors and to learn about the new features in the <a href="https://index.ros.org/doc/ros2/">Robot
+Operating System (ROS) 2</a>
+<a href="https://navigation.ros.org/">Navigation2</a> software stack. Also, I think it’s a
+really funny name.</p>
+
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/ruler.jpg" alt="Ruler" /></p>
+
+<p>To be completely honest, when my friend and I co-founded <a href="https://www.rifrobotics.com">RIF
+Robotics</a> in the fall of 2020, we submitted an
+application to Clearpath Robotics’
+<a href="https://clearpathrobotics.com/blog/2020/11/winners-of-the-2020-partnerbot-grant-program-announced-putting-robotic-platforms-in-researchers-hands/">PartnerBot</a>
+program and we won! That means we will be receiving an industrial-grade indoor
+ground robot in February 2021 named
+<a href="https://clearpathrobotics.com/dingo-indoor-mobile-robot/">Dingo</a>.</p>
+
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/dingo.png" alt="Bamboomba" /></p>
+
+<p>We will be using the ROS2 and Navigation2 software stacks to control Dingo and
+build maps of the environment with a LIDAR, but I wanted to get a head start on
+the software development, so I built Bamboomba as a surrogate platform. Both
+Bamboomba and Dingo will have the same sensor suite and software stack, so
+moving between the two platforms should be fairly seamless. I did go to college
+for like thirteen years, right? The sensor suite consists of an <a href="https://www.intelrealsense.com/depth-camera-d435/">Intel
+RealSense D435i</a> and an <a href="https://www.slamtec.com/en/Lidar/A2">RP
+LIDAR A2</a>.</p>
+
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/sensor-suite.jpg" alt="Sensors" /></p>
+
+<p>The D435i provides an inertial measurement unit (i.e., measurements of linear
+and rotational accelerations), a 2D RGB image, and a 3D point cloud of the
+environment. The RP LIDAR uses a rotating laser to measure distances to objects
+around the robot in 360°. There will be more on these sensors and how
+they help the robot to build maps and navigate around obstacles in a future
+post. The important part to note at this moment is that I hand cut and drilled
+the mounts for these professional sensors without using any CAD software or 3D
+printers. One of my industrial design friends said that he calls anything not
+cut by a <a href="https://en.wikipedia.org/wiki/Numerical_control">CNC</a> machine
+“folksy.”  Like folk music. Not written down. I prefer the term, “Artisinal
+Robotics.”</p>
+
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/artisinal-robotics.gif" alt="Artisinal Robotics" /></p>
+
+<p>That GIF isn’t from a random woodworking project. I was fine-tuning the
+mounting block for the LIDAR on the shooting board that I made with a chisel
+and hand router.</p>
+
+<p>Bamboomba is loosely based on the
+<a href="https://www.turtlebot.com/turtlebot2/">Turtlebot</a> design, which has been used
+extensively in the open source and academic robotics communities.</p>
+
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/turtlebot.png" alt="Turtlebot" /></p>
+
+<p>But Bamboomba is a lot cheaper, only took one day to build from scratch, and,
+literally, can’t be faithfully reproduced! The main idea I took from the
+Turtlebot was the multiple levels offset by aluminum stand-offs. This sparse
+design allows a roboticist to attach random sensors to the platforms and a
+closed laptop (the robot “brains”) can fit on one of the platforms. I was able
+to cut the platforms out of spare plywood using my scroll saw. I didn’t want to
+order aluminum stand-offs from an expensive mechanical parts store and, more
+importantly, wait two weeks for the parts to arrive, so I drove five minutes to
+Lowe’s and stared at the mechanical fasteners section for an hour until I came
+up with the following design for the stand-offs:</p>
+
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/standoffs.jpg" alt="Stand offs" /></p>
+
+<p>The aluminum rod cost $10 and I was able to cut it precisely with a pipe cutter:</p>
+
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/cutting.jpg" alt="Cutting" /></p>
+
+<p>Once the aluminum rod stand-offs were cut to size, it was fairly easy to
+assemble the platforms. The most tedious part was determining where to drill
+the holes for the screws to pass through without a template. This involved
+drawing intersecting lines to find the midpoint between mounting screw
+locations and transferring hole points by laying the wooden platforms directly
+on top of each other. If you look closely, you can see my layout lines.</p>
+
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/platforms.jpg" alt="Standoffs" /></p>
+
+<p>When designing a ground robot with a single planar LIDAR, one of the most
+difficult design decisions is where to place the LIDAR. If the LIDAR is mounted
+at a low-point on the robot, it will ensure that the LIDAR doesn’t miss any
+obstacles close to the ground. However, if the LIDAR is close to the ground,
+the laser will most likely be obstructed by other mechanical structures on the
+robot. This is opposed to mounting the LIDAR on top of the robot, where it can
+have an unobstructed 360° view of its surroundings. However, the LIDAR will
+not be able to see objects that are below its line-of-sight, which could result
+in collisions with low-lying obstacles! Of course, you could use multiple
+LIDARs to cover the blind spots, but that costs more money and Bamboomba is not
+that kind of robot. I drilled mounting holes for the LIDAR in both the bottom
+and the top platforms, so that I could experiment with mounting the LIDAR at
+two different heights. When the LIDAR is in the bottom configuration, I route
+the LIDAR and serial cables behind the aluminum stand-off to reduce the
+obstructions in the LIDAR’s field-of-view. The cables are beautifully secured
+in place with zip ties.</p>
+
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/lidar-bottom.jpg" alt="LIDAR Bottom" /></p>
+
+<p>When the LIDAR is mounted in the top configuration, it has to be raised
+slightly to ensure that its laser is not obstructed by the RealSense
+camera. This is done with the 3/4” piece of wood that played the starring role
+in the previous animated GIF.</p>
+
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/angle-view.jpg" alt="Angle View" /></p>
+
+<p>Finally, the laptop is mounted to Bamboomba with velcro to make it easy to remove.</p>
+
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/front-view.jpg" alt="Front View" /></p>
+
+<p>I hope this article will inspire others to hack their own Roombas into wooden
+abominations. There are <a href="https://github.com/tork-a/roomblock">other</a> ways to
+<a href="https://www.turtlebot.com/build/">build</a> or
+<a href="https://dabit.industries/products/turtlebot-2">buy</a> a similar robot, but I
+like mine best. Bamboomba’s platform is made from readily accessible parts that
+can be put together in a day with some basic cutting tools.</p>
+
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/parts-on-bench.jpg" alt="Parts" /></p>
+
+<p>I’ve got to come clean about something that has really been bothering me. The
+robot’s base is not really a Roomba. It’s an <a href="https://en.wikipedia.org/wiki/IRobot_Create">iRobot
+Create</a>. But the bamboo + Roomba
+name was <em>soooo</em> good and it’s basically the Roomba without the vacuum. My
+roommate from college gifted me the Create back in 2008 for being in his
+wedding when I had not even considered studying robotics in graduate school. He
+knew what I wanted.</p>
+
+<p>In a future post, I will describe how the ROS2 and Navigation2 software stacks
+are used to build maps and navigate around obstacles in
+the environment with the LIDAR.</p>
+
+<p>Thanks for following along.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2021-01-19T11:00:00-05:00">January 19, 2021</time></p>
+
+
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?via=syllogismrxs&text=Bamboomba%3A+The+sort+of+wooden+robot.%20https%3A%2F%2Fkevindemarco.com%2Frobotics%2Fros%2Fwoodworking%2F2021%2F01%2F19%2Fbamboomba-part-1.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fkevindemarco.com%2Frobotics%2Fros%2Fwoodworking%2F2021%2F01%2F19%2Fbamboomba-part-1.html" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fkevindemarco.com%2Frobotics%2Fros%2Fwoodworking%2F2021%2F01%2F19%2Fbamboomba-part-1.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/woodworking/handtools/box/2021/01/15/dovetail-box.html" class="pagination--pager" title="A Handcrafted Dovetail Box
+">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+      <div class="page__comments">
+  
+  
+      <h4 class="page__comments-title">Comments</h4>
+      <section id="disqus_thread"></section>
+    
+</div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/woodworking/handtools/box/2021/01/15/dovetail-box.html" rel="permalink">A Handcrafted Dovetail Box
+</a>
+      
+      
+        <div class="archive__item-teaser">
+          <a href="/woodworking/handtools/box/2021/01/15/dovetail-box.html" rel="permalink"><img src="/assets/images/2021-01-15-dovetail-box/teaser.jpg" alt=""></a>
+        </div>
+    
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          3 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">
+
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming.html" rel="permalink">Remote Pair Programming via SSH and wemux on Linux
+</a>
+      
+      
+        <div class="archive__item-teaser">
+          <a href="/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming.html" rel="permalink"><img src="/assets/images/2020-03-25-pair-programming/teaser.png" alt=""></a>
+        </div>
+    
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          6 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">There are several benefits to the use of pair programming in the software
+development process: fewer mistakes, better understanding of the codebase
+across mu...</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2021 Kevin DeMarco. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-23277342-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-23277342-1', { 'anonymize_ip': false});
+</script>
+
+
+
+
+
+
+    
+  <script>
+    var disqus_config = function () {
+      this.page.url = "https://kevindemarco.com/robotics/ros/woodworking/2021/01/19/bamboomba-part-1.html";  /* Replace PAGE_URL with your page's canonical URL variable */
+      this.page.identifier = "/robotics/ros/woodworking/2021/01/19/bamboomba-part-1"; /* Replace PAGE_IDENTIFIER with your page's unique identifier variable */
+    };
+    (function() { /* DON'T EDIT BELOW THIS LINE */
+      var d = document, s = d.createElement('script');
+      s.src = 'https://demarco.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+
+
+
+
+
+  </body>
+</html>
