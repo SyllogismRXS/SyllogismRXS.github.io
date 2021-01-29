@@ -48,10 +48,10 @@ We will be using the ROS2 and Navigation2 software stacks to control Dingo and
 build maps of the environment with a LIDAR, but I wanted to get a head start on
 the software development, so I built Bamboomba as a surrogate platform. Both
 Bamboomba and Dingo will have the same sensor suite and software stack, so
-moving between the two platforms should be fairly seamless. I did go to college
-for like thirteen years, right? The sensor suite consists of an [Intel
-RealSense D435i](https://www.intelrealsense.com/depth-camera-d435/) and an [RP
-LIDAR A2](https://www.slamtec.com/en/Lidar/A2).
+moving between the two platforms should be fairly seamless. I do know what I'm
+doing, right? The sensor suite consists of an [Intel RealSense
+D435i](https://www.intelrealsense.com/depth-camera-d435/) and an [RP LIDAR
+A2](https://www.slamtec.com/en/Lidar/A2).
 
 ![Sensors]({{ site.url }}{{ site.baseurl }}/assets/images/2021-01-19-bamboomba-part-1/sensor-suite.jpg)
 
