@@ -1,0 +1,94 @@
+---
+layout: single
+title:  "A hoarder's guide to wood storage"
+date:   2021-02-22 10:45:00 -0400
+categories: woodworking storage
+header:
+  teaser: /assets/images/2021-02-22-wood-rack/wood-on-rack-2.jpg
+  og_image: /assets/images/2021-02-22-wood-rack/wood-on-rack-2.jpg
+  image: /assets/images/2021-01-15-dovetail-box/header.jpg
+---
+
+Do you actually have a hoarding problem if you can build efficient storage
+solutions for things that you can't throw away? I'm not going to answer that
+question because I probably won't like the answer.
+
+![Wood on ground]({{ site.url }}{{ site.baseurl }}/assets/images/2021-02-22-wood-rack/wood-on-ground-1.jpg)
+
+It's not that I have a hoarding problem. It's that I don't like waste. I don't
+think our throw-away culture is healthy. The best place for a woodworker to
+store their wood is at the lumber yard, but woodworkers will always have extra
+pieces from previous projects. I want to be able to save the cut-offs from
+bigger woodworking projects for smaller projects.
+
+![Wood on ground]({{ site.url }}{{ site.baseurl }}/assets/images/2021-02-22-wood-rack/wood-on-ground-2.jpg)
+
+See? I don't have a problem! I should totally buy more wood to store my other
+wood! This
+[guy's](https://jayscustomcreations.com/2014/08/inexpensive-conduit-lumber-rack/)
+wood storage design looks simple enough.
+
+![Empty wall]({{ site.url }}{{ site.baseurl }}/assets/images/2021-02-22-wood-rack/empy-wall.jpg)
+
+This empty white wall is just asking to be the supporting role in a terrifying
+hostage video. We better cover it up with a wood rack.
+
+I started the project by cutting three 2x4's to length, with a little 45&deg;
+cut at the bottom to reduce chipping. These will be attached to the wall.
+
+![Twobys]({{ site.url }}{{ site.baseurl }}/assets/images/2021-02-22-wood-rack/twobys.jpg)
+
+I then cut the pieces of metal conduit down to size with a reciprocating
+saw.
+
+![Cutting Conduit]({{ site.url }}{{ site.baseurl }}/assets/images/2021-02-22-wood-rack/cut-conduit.jpg)
+
+I don't want to injure my delicate hands, so it's important to clean up the
+rough metal edges. I don't have a grinder or stationary belt sander, so I just
+clamped my belt sander to the table.
+
+![Sanding]({{ site.url }}{{ site.baseurl }}/assets/images/2021-02-22-wood-rack/sanding.jpg)
+
+![Conduit]({{ site.url }}{{ site.baseurl }}/assets/images/2021-02-22-wood-rack/conduit.jpg)
+
+To increase the stability of the wood being stored on the rack, I wanted to
+slightly angle the conduit up. This means that I had to drill the holes into
+the 2x4's at an angle. The drill press makes this job easy.
+
+![Drill press]({{ site.url }}{{ site.baseurl }}/assets/images/2021-02-22-wood-rack/drill-press.jpg)
+
+I knew I kept those two sets of forstner bits for a reason...
+
+![Drill hole]({{ site.url }}{{ site.baseurl }}/assets/images/2021-02-22-wood-rack/drill-hole.jpg)
+
+The hardest part about this project was installing the 2x4 supports on the
+cinder block wall. When drilling into a cinder block wall, the hammer drill
+makes a high-pitched crunching noise that makes me question home ownership and
+the integrity of the foundation.
+
+![Hammer drill]({{ site.url }}{{ site.baseurl }}/assets/images/2021-02-22-wood-rack/hammer-drill.jpg)
+
+I had to use a hammer drill to put holes in the cinder blocks to accept the
+[Tapcon](https://www.tapcon.com/) screws I used to hold the wood against the
+wall. Despite following the instructions for the Tapcon screws, it seems that
+the suggested masonry drill bit sizes never work with their anchors. I don't
+know what's wrong. It could be that maybe I'm illiterate, but Tapcon uses color
+codes to match the suggested drill bits size with the appropriate anchors, so
+that's not it.
+
+After a few hours of white-knuckling the hammer drill and grinding my teeth, I
+was able to get three good anchors through each 2x4 and into the wall.
+
+![Empty Rack]({{ site.url }}{{ site.baseurl }}/assets/images/2021-02-22-wood-rack/wood-rack-empty.jpg)
+
+To make sure the rack will hold the pieces of wood level, use a bubble level
+across the conduit between two 2x4's while drilling the holes for the
+screws. This will ensure that the stored wood will distribute its weight evenly
+across the supports.
+
+![Wood Rack]({{ site.url }}{{ site.baseurl }}/assets/images/2021-02-22-wood-rack/wood-rack.jpg)
+
+Yes, that's satisfying. My shame is no longer on the ground, but proudly
+displayed on the wall.
+
+![Wood on Rack]({{ site.url }}{{ site.baseurl }}/assets/images/2021-02-22-wood-rack/wood-on-rack-1.jpg)
