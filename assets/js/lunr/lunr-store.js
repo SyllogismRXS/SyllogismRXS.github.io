@@ -16,4 +16,10 @@ var store = [{
         "tags": [],
         "url": "https://kevindemarco.com/robotics/ros/woodworking/2021/01/19/bamboomba-part-1.html",
         "teaser": "https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/teaser.jpg"
+      },{
+        "title": "A hoarder's guide to wood storage",
+        "excerpt":"Do you actually have a hoarding problem if you can build efficient storage solutions for things that you can’t throw away? I’m not going to answer that question because I probably won’t like the answer. It’s not that I have a hoarding problem. It’s that I don’t like waste. I...","categories": ["woodworking","storage"],
+        "tags": [],
+        "url": "https://kevindemarco.com/woodworking/storage/2021/02/22/wood-rack.html",
+        "teaser": "https://kevindemarco.com/assets/images/2021-02-22-wood-rack/wood-on-rack-2.jpg"
       }]
