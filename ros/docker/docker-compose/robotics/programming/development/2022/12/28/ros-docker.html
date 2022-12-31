@@ -1,0 +1,965 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>ROS Development in Docker - Kevin DeMarco</title>
+<meta name="description" content="If you use the Robot Operating System (ROS) and you are frusterated with system dependencies, incompatible ROS / Linux operating system versions, and non-determinstic builds, then this article is for you.">
+
+
+  <meta name="author" content="Kevin DeMarco">
+  
+  <meta property="article:author" content="Kevin DeMarco">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Kevin DeMarco">
+<meta property="og:title" content="ROS Development in Docker">
+<meta property="og:url" content="https://kevindemarco.com/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker.html">
+
+
+  <meta property="og:description" content="If you use the Robot Operating System (ROS) and you are frusterated with system dependencies, incompatible ROS / Linux operating system versions, and non-determinstic builds, then this article is for you.">
+
+
+
+  <meta property="og:image" content="https://kevindemarco.com/assets/images/2022-12-28-ros-docker/docker-ros.png">
+
+
+
+  <meta name="twitter:site" content="@syllogismrxs">
+  <meta name="twitter:title" content="ROS Development in Docker">
+  <meta name="twitter:description" content="If you use the Robot Operating System (ROS) and you are frusterated with system dependencies, incompatible ROS / Linux operating system versions, and non-determinstic builds, then this article is for you.">
+  <meta name="twitter:url" content="https://kevindemarco.com/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker.html">
+
+  
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://kevindemarco.com/assets/images/2022-12-28-ros-docker/docker-ros.png">
+  
+
+  
+
+
+
+  <meta property="article:published_time" content="2022-12-28T09:45:00-05:00">
+
+
+
+
+
+
+<link rel="canonical" href="https://kevindemarco.com/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Kevin DeMarco",
+      "url": "https://kevindemarco.com/",
+      "sameAs": ["https://twitter.com/syllogismrxs","https://instagram.com/syllogismrxs","https://www.linkedin.com/in/kevindemarco"]
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Kevin DeMarco Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          Kevin DeMarco
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/">Blog</a>
+            </li><li class="masthead__menu-item">
+              <a href="/publications">Publications</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about">About</a>
+            </li><li class="masthead__menu-item">
+              <a href="/contact">Contact</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+  
+
+
+
+
+
+
+
+<div class="page__hero"
+  style=" background-image: url('');"
+>
+  
+    <img src="/assets/images/2022-12-28-ros-docker/docker-ros-header.png" alt="ROS Development in Docker" class="page__hero-image">
+  
+  
+</div>
+
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/KevinBW2.png" alt="Kevin DeMarco" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Kevin DeMarco</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Roboticist</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Atlanta, GA, USA</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://www.linkedin.com/in/kevindemarco" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span></a></li>
+          
+        
+          
+            <li><a href="https://github.com/SyllogismRXS" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://instagram.com/gotosemicolon" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-instagram" aria-hidden="true"></i><span class="label">Instagram</span></a></li>
+          
+        
+          
+            <li><a href="https://twitter.com/kevinjdemarco" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="ROS Development in Docker">
+    <meta itemprop="description" content="If you use the Robot Operating System (ROS) and you arefrusterated with system dependencies, incompatible ROS / Linux operating systemversions, and non-determinstic builds, then this article is for you.">
+    <meta itemprop="datePublished" content="2022-12-28T09:45:00-05:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">ROS Development in Docker
+</h1>
+          
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          6 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>If you use the <a href="https://www.ros.org">Robot Operating System (ROS)</a> and you are
+frusterated with system dependencies, incompatible ROS / Linux operating system
+versions, and non-determinstic builds, then this article is for you.</p>
+
+<p>For each of my ROS development workspaces, I create a
+<a href="https://www.docker.com/">Docker</a> development environment to isolate the ROS
+environment from my host system’s environment. This allows me to easily run an
+old version of ROS (e.g., ROS Kinetic), on a new version of Ubuntu (e.g.,
+Ubuntu 22.04 Jammy). Docker is similar to a very light-weight virtual machine,
+but Docker allows you to more easily share hardware resources between the host
+machine and the Docker container.</p>
+
+<p>There are a number of other guides to setup a  development
+environment:</p>
+<ul>
+  <li><a href="https://roboticseabass.com/2021/04/21/docker-and-ros/">ROS Docker 1</a></li>
+  <li><a href="https://tuw-cpsg.github.io/tutorials/docker-ros/">ROS Docker 2</a></li>
+  <li><a href="https://subscription.packtpub.com/book/hardware-&amp;-creative/9781786463654/1/ch01lvl1sec11/using-ros-from-a-docker-image">Using ROS from a Docker
+Image</a></li>
+  <li><a href="https://docs.freedomrobotics.ai/docs/ros-development-in-docker-on-mac-and-windows">ROS Dev in Docker
+Mac/Windows</a></li>
+</ul>
+
+<p>I think that many of the articles focus on basic Docker commands, instead of an
+opinionated description of how to organize your ROS workspaces and
+repositories to facilitate collaborative development.</p>
+
+<h2 id="design-requirements">Design Requirements</h2>
+
+<p>In our ROS Docker setup, we want to be able to:</p>
+
+<ol>
+  <li>Use our preferred code/text editor on the host system.</li>
+  <li>Launch ROS GUI programs from within the container.</li>
+  <li>Leverage the host system’s GPU, if available.</li>
+</ol>
+
+<h2 id="host-system-dependencies">Host System Dependencies</h2>
+
+<p>As a warning, I’m writing this guide from the perspective of someone who uses
+Ubuntu for development, but most of the instructions should apply to anyone
+using a Linux-based (amd64) system. (Note to self: try these instructions on my
+Windows 10 partition).</p>
+
+<ol>
+  <li>
+    <p><a href="https://docs.docker.com/engine/install/">Install Docker</a>. Make sure to
+follow the
+<a href="https://docs.docker.com/engine/install/linux-postinstall/">post-installation</a>
+steps, so you don’t have to use <code class="language-plaintext highlighter-rouge">sudo</code> to run Docker.</p>
+  </li>
+  <li>
+    <p><a href="https://docs.docker.com/compose/install/linux/">Install Docker Compose</a>.</p>
+  </li>
+  <li>
+    <p><a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">Install git</a>.</p>
+  </li>
+</ol>
+
+<p>That’s all you should need! We will be installing all the messy ROS bits inside
+of a Docker container, so your host system will stay nice and clean.</p>
+
+<h2 id="host-directory-setup--docker-build">Host Directory Setup / Docker Build</h2>
+
+<p>On my host machine, I keep all of my ROS projects in a folder located at
+<code class="language-plaintext highlighter-rouge">~/ros</code> and I will use that directory in this guide to be explicit, but you can
+use a different root directory.</p>
+
+<ol>
+  <li>
+    <p>Create the <code class="language-plaintext highlighter-rouge">src</code> directory in a new ROS workspace:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> mkdir -p ~/ros/ros_docker_example/workspace/src
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Create a <code class="language-plaintext highlighter-rouge">data</code> directory, which will be used to facilitate exchanging
+files (e.g., ROS bags), between the ROS Docker container and your host system:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> mkdir -p ~/ros/ros_docker_example/data
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Clone the ROS Docker setup files from my GitHub repository under the
+<code class="language-plaintext highlighter-rouge">ros_docker_example</code> directory:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> cd ~/ros/ros_docker_example
+ git clone https://github.com/SyllogismRXS/ros_docker_setup.git
+</code></pre></div>    </div>
+
+    <p>Your directory should now look like the following:</p>
+
+    <p><img src="https://kevindemarco.com/assets/images/2022-12-28-ros-docker/tree.png" alt="Directory Structure" /></p>
+  </li>
+  <li>
+    <p>Clone the ROS2 example repository into your workspace’s <code class="language-plaintext highlighter-rouge">src</code> folder. We
+will be building these example projects to test our build system. You would
+replace this repository with your own ROS repositories.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> cd ~/ros/ros_docker_example/workspace/src
+ git clone -b humble https://github.com/ros2/examples.git
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>We will now create a <code class="language-plaintext highlighter-rouge">.env</code> file in the same directory that contains the
+<code class="language-plaintext highlighter-rouge">docker-compose.yml</code> file with your user’s ID and group ID. This is needed,
+so that we can launch ROS GUIs from within the Docker container.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> cd ~/ros/ros_docker_example/ros_docker_setup
+ echo -e "USER_ID=$(id -u ${USER})\nGROUP_ID=$(id -g ${USER})" &gt; .env
+</code></pre></div>    </div>
+
+    <p>Docker compose will automatically read the <code class="language-plaintext highlighter-rouge">.env</code> file before running any
+ commands.</p>
+  </li>
+  <li>
+    <p>We can now build the Docker image in the <code class="language-plaintext highlighter-rouge">ros_docker_setup</code> directory:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> docker compose build
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="test-the-docker-environment">Test the Docker Environment</h2>
+
+<ol>
+  <li>
+    <p>Run the minimal subscriber example</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> docker compose up -d dev
+ docker exec -it ros_humble /bin/bash
+ ros2 run examples_rclcpp_minimal_subscriber subscriber_member_function
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>In a different terminal, run the minimal publisher example:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> docker exec -it ros_humble /bin/bash
+ ros2 run examples_rclcpp_minimal_publisher publisher_member_function
+</code></pre></div>    </div>
+
+    <p>At this point, you should see ROS messages being printed to the terminal.</p>
+  </li>
+  <li>
+    <p>Launch the rviz2 GUI from inside the container:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> docker exec -it ros_humble /bin/bash
+ rviz2
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="development-use-case">Development Use Case</h2>
+
+<p>The primary use case for this Docker setup is to develop ROS packages. After
+building the Docker image, you can start a container (once with the <code class="language-plaintext highlighter-rouge">up</code> command,
+enter into it (with the <code class="language-plaintext highlighter-rouge">exec</code> command), run a build command (with <code class="language-plaintext highlighter-rouge">colcon</code>),
+and run other ROS commands. For example, you can start and enter a container:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker compose up -d dev
+docker exec -it ros_humble /bin/bash
+</code></pre></div></div>
+
+<p>At this point, you can use your host’s code/text editor to make changes to code
+in your host’s workspace <code class="language-plaintext highlighter-rouge">src</code> directory and they will immediately take effect
+in the container’s <code class="language-plaintext highlighter-rouge">src</code> directory. Then, inside of the container, build the
+workspace with the command:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>colcon build --symlink-install
+</code></pre></div></div>
+
+<p>You can use multiple Docker container terminals by running <code class="language-plaintext highlighter-rouge">docker exec -it
+ros_humble /bin/bash</code> in another terminal after the <code class="language-plaintext highlighter-rouge">up</code> command was already
+run once.</p>
+
+<h2 id="detailed-notes">Detailed Notes</h2>
+
+<p>The following are detailed notes that describe some of the Docker
+options/features and why they were chosen. This section is most helpful if you
+following along with the <code class="language-plaintext highlighter-rouge">docker-compose.yml</code> and <code class="language-plaintext highlighter-rouge">Dockerfile</code> commands in the
+<a href="https://github.com/SyllogismRXS/ros_docker_setup"><code class="language-plaintext highlighter-rouge">ros_docker_setup</code></a>
+repository.</p>
+
+<h3 id="docker-composeyml">docker-compose.yml</h3>
+
+<ol>
+  <li>
+    <p>The
+<a href="https://github.com/SyllogismRXS/ros_docker_setup/blob/main/docker-compose.yml"><code class="language-plaintext highlighter-rouge">docker-compose.yml</code></a>
+file contains two separate “services”: <code class="language-plaintext highlighter-rouge">dev</code> and <code class="language-plaintext highlighter-rouge">dev-nvidia</code>. The <code class="language-plaintext highlighter-rouge">dev-nvidia</code>
+service contains additional flags to share the host’s NVIDIA GPU with the
+Docker container. In order to use the <code class="language-plaintext highlighter-rouge">dev-nvidia</code> service, you will need both
+an NVIDIA GPU and you will need to install <code class="language-plaintext highlighter-rouge">nvidia-docker2</code> using NVIDIA’s
+<a href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html">instructions</a>.</p>
+  </li>
+  <li>
+    <p>The <code class="language-plaintext highlighter-rouge">USER_ID</code> and <code class="language-plaintext highlighter-rouge">GROUP_ID</code> variables are passed from <code class="language-plaintext highlighter-rouge">.env</code> to the Docker
+build command via the build arguments:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> args:
+   USER_ID: ${USER_ID:-0}
+   GROUP_ID: ${GROUP_ID:-0}
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>The <code class="language-plaintext highlighter-rouge">network_mode</code> is set to <code class="language-plaintext highlighter-rouge">host</code> to allow the container to have full
+access to the host’s networking system. This is fine for a development
+environment, but should be made more restrictive in a deployed container
+(not our current use-case).</p>
+  </li>
+  <li>
+    <p>The <code class="language-plaintext highlighter-rouge">DISPLAY</code> environment variable display is passed from the host to the
+container to enable GUI applications. In addition, the <code class="language-plaintext highlighter-rouge">.X11-unix</code> and
+<code class="language-plaintext highlighter-rouge">.docker.xauth</code> files are mounted from the host to the container in the
+<code class="language-plaintext highlighter-rouge">volumes</code> section to enable GUIs.</p>
+  </li>
+  <li>
+    <p>The <code class="language-plaintext highlighter-rouge">src</code> directory of the workspace is mounted from the host to the
+container in the <code class="language-plaintext highlighter-rouge">volumes</code> section. It is important to note that the
+<code class="language-plaintext highlighter-rouge">volumes</code> section of the <code class="language-plaintext highlighter-rouge">docker-compose.yml</code> file is only relevant during
+<code class="language-plaintext highlighter-rouge">up</code> and <code class="language-plaintext highlighter-rouge">run</code> commands, not during the <code class="language-plaintext highlighter-rouge">build</code> phase. During build time,
+the code is copied into the Docker image with the <code class="language-plaintext highlighter-rouge">COPY</code> command in the
+<code class="language-plaintext highlighter-rouge">Dockerfile</code>.</p>
+  </li>
+</ol>
+
+<h3 id="dockerfile">Dockerfile</h3>
+
+<ol>
+  <li>
+    <p>The
+<a href="https://github.com/SyllogismRXS/ros_docker_setup/blob/main/Dockerfile"><code class="language-plaintext highlighter-rouge">Dockerfile</code></a>
+contains the instructions to build the ROS Docker image. Our <code class="language-plaintext highlighter-rouge">Dockerfile</code> is
+based on the <code class="language-plaintext highlighter-rouge">osrf/ros:humble-desktop-full</code> Docker image provided by the
+main ROS folks (OSRF, OpenRobotics, etc.) This image already contains an
+installed version of ROS Humble and many of the GUIs and build utilities,
+which we will be using.</p>
+  </li>
+  <li>
+    <p>After declaring the <code class="language-plaintext highlighter-rouge">FROM</code> image and some basic metadata, we install a
+specific Debian package:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> RUN apt-get update \
+     &amp;&amp; apt-get install -y \
+     python3-pip \
+     &amp;&amp; rm -rf /var/lib/apt/lists/*
+</code></pre></div>    </div>
+
+    <p>In your own Dockerfile, you would augment this Debian package installation
+ list to fit your needs.</p>
+  </li>
+  <li>
+    <p>Using the <code class="language-plaintext highlighter-rouge">adduser</code> command, we create a <code class="language-plaintext highlighter-rouge">ros</code> user with the same <code class="language-plaintext highlighter-rouge">USER_ID</code>
+and <code class="language-plaintext highlighter-rouge">GROUP_ID</code> as your host system, which enables GUI applications. In
+addition, the <code class="language-plaintext highlighter-rouge">ros</code> user can issue <code class="language-plaintext highlighter-rouge">sudo</code> commands without a
+password. Again, this is fine for a local development environment, but you
+wouldn’t do this in a deployed Docker image.</p>
+  </li>
+  <li>
+    <p>We source the main ROS system’s setup file (<code class="language-plaintext highlighter-rouge">/opt/ros/humble/setup.bash</code>)
+and colcon’s setup file to the <code class="language-plaintext highlighter-rouge">ros</code> user’s <code class="language-plaintext highlighter-rouge">.bashrc</code>. This provides the
+<code class="language-plaintext highlighter-rouge">ros</code> user with access to the ROS environment every time the container is
+entered.</p>
+  </li>
+  <li>
+    <p>Near the end of the <code class="language-plaintext highlighter-rouge">Dockerfile</code>, the code is copied into the image with the
+<code class="language-plaintext highlighter-rouge">COPY</code> command. The code is copied into the image, so that we can install
+it’s dependencies and make sure it builds deterministically. However, when
+the user runs the <code class="language-plaintext highlighter-rouge">docker compose up</code> command, the code on the host system
+is mounted over the code that was previously copied into the image. This
+allows changes to the repository code to show up immediately inside the
+container for incremental builds.</p>
+  </li>
+  <li>
+    <p>Finally, <code class="language-plaintext highlighter-rouge">rosdep</code> is used to install the repository’s dependencies and
+<code class="language-plaintext highlighter-rouge">colcon</code> is used to perform the workspace build. In addition, the
+workspace’s <code class="language-plaintext highlighter-rouge">local_setup.bash</code> is added to the <code class="language-plaintext highlighter-rouge">ros</code> user’s <code class="language-plaintext highlighter-rouge">.bashrc</code> file,
+so that it’s resources are immediately available when the container is
+entered.</p>
+  </li>
+</ol>
+
+<h2 id="looking-forward">Looking Forward</h2>
+
+<p>In a future post I will describe how I use <a href="https://direnv.net/"><code class="language-plaintext highlighter-rouge">direnv</code></a> to
+quickly open multiple ROS Docker containers.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2022-12-28T09:45:00-05:00">December 28, 2022</time></p>
+
+
+      </footer>
+
+      <section class="page__share">
+  
+    <h4 class="page__share-title">Share on</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?via=syllogismrxs&text=ROS+Development+in+Docker%20https%3A%2F%2Fkevindemarco.com%2Fros%2Fdocker%2Fdocker-compose%2Frobotics%2Fprogramming%2Fdevelopment%2F2022%2F12%2F28%2Fros-docker.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fkevindemarco.com%2Fros%2Fdocker%2Fdocker-compose%2Frobotics%2Fprogramming%2Fdevelopment%2F2022%2F12%2F28%2Fros-docker.html" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fkevindemarco.com%2Fros%2Fdocker%2Fdocker-compose%2Frobotics%2Fprogramming%2Fdevelopment%2F2022%2F12%2F28%2Fros-docker.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/woodworking/storage/2021/02/22/wood-rack.html" class="pagination--pager" title="A hoarder’s guide to wood storage
+">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+      <div class="page__comments">
+  
+  
+      <h4 class="page__comments-title">Leave a comment</h4>
+      <section id="disqus_thread"></section>
+    
+</div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You may also enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/woodworking/storage/2021/02/22/wood-rack.html" rel="permalink">A hoarder’s guide to wood storage
+</a>
+      
+      
+        <div class="archive__item-teaser">
+          <a href="/woodworking/storage/2021/02/22/wood-rack.html" rel="permalink"><img src="/assets/images/2021-02-22-wood-rack/wood-on-rack-2.jpg" alt=""></a>
+        </div>
+    
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          2 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Do you actually have a hoarding problem if you can build efficient storage
+solutions for things that you can’t throw away? I’m not going to answer that
+quest...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/robotics/ros/woodworking/2021/01/19/bamboomba-part-1.html" rel="permalink">Bamboomba: The sort of wooden robot.
+</a>
+      
+      
+        <div class="archive__item-teaser">
+          <a href="/robotics/ros/woodworking/2021/01/19/bamboomba-part-1.html" rel="permalink"><img src="/assets/images/2021-01-19-bamboomba-part-1/teaser.jpg" alt=""></a>
+        </div>
+    
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">What do you get when you cross a Roomba…
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/woodworking/handtools/box/2021/01/15/dovetail-box.html" rel="permalink">A Handcrafted Dovetail Box
+</a>
+      
+      
+        <div class="archive__item-teaser">
+          <a href="/woodworking/handtools/box/2021/01/15/dovetail-box.html" rel="permalink"><img src="/assets/images/2021-01-15-dovetail-box/teaser.jpg" alt=""></a>
+        </div>
+    
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          3 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming.html" rel="permalink">Remote Pair Programming via SSH and wemux on Linux
+</a>
+      
+      
+        <div class="archive__item-teaser">
+          <a href="/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming.html" rel="permalink"><img src="/assets/images/2020-03-25-pair-programming/teaser.png" alt=""></a>
+        </div>
+    
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          6 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">There are several benefits to the use of pair programming in the software
+development process: fewer mistakes, better understanding of the codebase
+across mu...</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+
+    
+      
+        
+      
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 Kevin DeMarco. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-23277342-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-23277342-1', { 'anonymize_ip': false});
+</script>
+
+
+
+
+
+
+    
+  <script>
+    var disqus_config = function () {
+      this.page.url = "https://kevindemarco.com/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker.html";  /* Replace PAGE_URL with your page's canonical URL variable */
+      this.page.identifier = "/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker"; /* Replace PAGE_IDENTIFIER with your page's unique identifier variable */
+    };
+    (function() { /* DON'T EDIT BELOW THIS LINE */
+      var d = document, s = d.createElement('script');
+      s.src = 'https://demarco.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+
+
+
+
+
+  </body>
+</html>

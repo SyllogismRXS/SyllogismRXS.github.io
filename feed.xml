@@ -1,132 +1,417 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kevindemarco.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kevindemarco.com/" rel="alternate" type="text/html" /><updated>2021-02-22T19:08:53-05:00</updated><id>https://kevindemarco.com/feed.xml</id><title type="html">Kevin DeMarco</title><subtitle>I write about robotics, technology, music, woodworking, and bicycling.</subtitle><author><name>Kevin DeMarco</name></author><entry><title type="html">A hoarder’s guide to wood storage</title><link href="https://kevindemarco.com/woodworking/storage/2021/02/22/wood-rack.html" rel="alternate" type="text/html" title="A hoarder’s guide to wood storage" /><published>2021-02-22T09:45:00-05:00</published><updated>2021-02-22T09:45:00-05:00</updated><id>https://kevindemarco.com/woodworking/storage/2021/02/22/wood-rack</id><content type="html" xml:base="https://kevindemarco.com/woodworking/storage/2021/02/22/wood-rack.html">&lt;p&gt;Do you actually have a hoarding problem if you can build efficient storage
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.1">Jekyll</generator><link href="https://kevindemarco.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kevindemarco.com/" rel="alternate" type="text/html" /><updated>2022-12-31T16:14:29-05:00</updated><id>https://kevindemarco.com/feed.xml</id><title type="html">Kevin DeMarco</title><subtitle>I write about robotics, technology, music, woodworking, and bicycling.</subtitle><author><name>Kevin DeMarco</name></author><entry><title type="html">ROS Development in Docker</title><link href="https://kevindemarco.com/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker.html" rel="alternate" type="text/html" title="ROS Development in Docker" /><published>2022-12-28T09:45:00-05:00</published><updated>2022-12-28T09:45:00-05:00</updated><id>https://kevindemarco.com/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker</id><content type="html" xml:base="https://kevindemarco.com/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker.html"><![CDATA[<p>If you use the <a href="https://www.ros.org">Robot Operating System (ROS)</a> and you are
+frusterated with system dependencies, incompatible ROS / Linux operating system
+versions, and non-determinstic builds, then this article is for you.</p>
+
+<p>For each of my ROS development workspaces, I create a
+<a href="https://www.docker.com/">Docker</a> development environment to isolate the ROS
+environment from my host system’s environment. This allows me to easily run an
+old version of ROS (e.g., ROS Kinetic), on a new version of Ubuntu (e.g.,
+Ubuntu 22.04 Jammy). Docker is similar to a very light-weight virtual machine,
+but Docker allows you to more easily share hardware resources between the host
+machine and the Docker container.</p>
+
+<p>There are a number of other guides to setup a  development
+environment:</p>
+<ul>
+  <li><a href="https://roboticseabass.com/2021/04/21/docker-and-ros/">ROS Docker 1</a></li>
+  <li><a href="https://tuw-cpsg.github.io/tutorials/docker-ros/">ROS Docker 2</a></li>
+  <li><a href="https://subscription.packtpub.com/book/hardware-&amp;-creative/9781786463654/1/ch01lvl1sec11/using-ros-from-a-docker-image">Using ROS from a Docker
+Image</a></li>
+  <li><a href="https://docs.freedomrobotics.ai/docs/ros-development-in-docker-on-mac-and-windows">ROS Dev in Docker
+Mac/Windows</a></li>
+</ul>
+
+<p>I think that many of the articles focus on basic Docker commands, instead of an
+opinionated description of how to organize your ROS workspaces and
+repositories to facilitate collaborative development.</p>
+
+<h2 id="design-requirements">Design Requirements</h2>
+
+<p>In our ROS Docker setup, we want to be able to:</p>
+
+<ol>
+  <li>Use our preferred code/text editor on the host system.</li>
+  <li>Launch ROS GUI programs from within the container.</li>
+  <li>Leverage the host system’s GPU, if available.</li>
+</ol>
+
+<h2 id="host-system-dependencies">Host System Dependencies</h2>
+
+<p>As a warning, I’m writing this guide from the perspective of someone who uses
+Ubuntu for development, but most of the instructions should apply to anyone
+using a Linux-based (amd64) system. (Note to self: try these instructions on my
+Windows 10 partition).</p>
+
+<ol>
+  <li>
+    <p><a href="https://docs.docker.com/engine/install/">Install Docker</a>. Make sure to
+follow the
+<a href="https://docs.docker.com/engine/install/linux-postinstall/">post-installation</a>
+steps, so you don’t have to use <code class="language-plaintext highlighter-rouge">sudo</code> to run Docker.</p>
+  </li>
+  <li>
+    <p><a href="https://docs.docker.com/compose/install/linux/">Install Docker Compose</a>.</p>
+  </li>
+  <li>
+    <p><a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">Install git</a>.</p>
+  </li>
+</ol>
+
+<p>That’s all you should need! We will be installing all the messy ROS bits inside
+of a Docker container, so your host system will stay nice and clean.</p>
+
+<h2 id="host-directory-setup--docker-build">Host Directory Setup / Docker Build</h2>
+
+<p>On my host machine, I keep all of my ROS projects in a folder located at
+<code class="language-plaintext highlighter-rouge">~/ros</code> and I will use that directory in this guide to be explicit, but you can
+use a different root directory.</p>
+
+<ol>
+  <li>
+    <p>Create the <code class="language-plaintext highlighter-rouge">src</code> directory in a new ROS workspace:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> mkdir -p ~/ros/ros_docker_example/workspace/src
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Create a <code class="language-plaintext highlighter-rouge">data</code> directory, which will be used to facilitate exchanging
+files (e.g., ROS bags), between the ROS Docker container and your host system:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> mkdir -p ~/ros/ros_docker_example/data
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Clone the ROS Docker setup files from my GitHub repository under the
+<code class="language-plaintext highlighter-rouge">ros_docker_example</code> directory:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> cd ~/ros/ros_docker_example
+ git clone https://github.com/SyllogismRXS/ros_docker_setup.git
+</code></pre></div>    </div>
+
+    <p>Your directory should now look like the following:</p>
+
+    <p><img src="https://kevindemarco.com/assets/images/2022-12-28-ros-docker/tree.png" alt="Directory Structure" /></p>
+  </li>
+  <li>
+    <p>Clone the ROS2 example repository into your workspace’s <code class="language-plaintext highlighter-rouge">src</code> folder. We
+will be building these example projects to test our build system. You would
+replace this repository with your own ROS repositories.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> cd ~/ros/ros_docker_example/workspace/src
+ git clone -b humble https://github.com/ros2/examples.git
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>We will now create a <code class="language-plaintext highlighter-rouge">.env</code> file in the same directory that contains the
+<code class="language-plaintext highlighter-rouge">docker-compose.yml</code> file with your user’s ID and group ID. This is needed,
+so that we can launch ROS GUIs from within the Docker container.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> cd ~/ros/ros_docker_example/ros_docker_setup
+ echo -e "USER_ID=$(id -u ${USER})\nGROUP_ID=$(id -g ${USER})" &gt; .env
+</code></pre></div>    </div>
+
+    <p>Docker compose will automatically read the <code class="language-plaintext highlighter-rouge">.env</code> file before running any
+ commands.</p>
+  </li>
+  <li>
+    <p>We can now build the Docker image in the <code class="language-plaintext highlighter-rouge">ros_docker_setup</code> directory:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> docker compose build
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="test-the-docker-environment">Test the Docker Environment</h2>
+
+<ol>
+  <li>
+    <p>Run the minimal subscriber example</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> docker compose up -d dev
+ docker exec -it ros_humble /bin/bash
+ ros2 run examples_rclcpp_minimal_subscriber subscriber_member_function
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>In a different terminal, run the minimal publisher example:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> docker exec -it ros_humble /bin/bash
+ ros2 run examples_rclcpp_minimal_publisher publisher_member_function
+</code></pre></div>    </div>
+
+    <p>At this point, you should see ROS messages being printed to the terminal.</p>
+  </li>
+  <li>
+    <p>Launch the rviz2 GUI from inside the container:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> docker exec -it ros_humble /bin/bash
+ rviz2
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="development-use-case">Development Use Case</h2>
+
+<p>The primary use case for this Docker setup is to develop ROS packages. After
+building the Docker image, you can start a container (once with the <code class="language-plaintext highlighter-rouge">up</code> command,
+enter into it (with the <code class="language-plaintext highlighter-rouge">exec</code> command), run a build command (with <code class="language-plaintext highlighter-rouge">colcon</code>),
+and run other ROS commands. For example, you can start and enter a container:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker compose up -d dev
+docker exec -it ros_humble /bin/bash
+</code></pre></div></div>
+
+<p>At this point, you can use your host’s code/text editor to make changes to code
+in your host’s workspace <code class="language-plaintext highlighter-rouge">src</code> directory and they will immediately take effect
+in the container’s <code class="language-plaintext highlighter-rouge">src</code> directory. Then, inside of the container, build the
+workspace with the command:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>colcon build --symlink-install
+</code></pre></div></div>
+
+<p>You can use multiple Docker container terminals by running <code class="language-plaintext highlighter-rouge">docker exec -it
+ros_humble /bin/bash</code> in another terminal after the <code class="language-plaintext highlighter-rouge">up</code> command was already
+run once.</p>
+
+<h2 id="detailed-notes">Detailed Notes</h2>
+
+<p>The following are detailed notes that describe some of the Docker
+options/features and why they were chosen. This section is most helpful if you
+following along with the <code class="language-plaintext highlighter-rouge">docker-compose.yml</code> and <code class="language-plaintext highlighter-rouge">Dockerfile</code> commands in the
+<a href="https://github.com/SyllogismRXS/ros_docker_setup"><code class="language-plaintext highlighter-rouge">ros_docker_setup</code></a>
+repository.</p>
+
+<h3 id="docker-composeyml">docker-compose.yml</h3>
+
+<ol>
+  <li>
+    <p>The
+<a href="https://github.com/SyllogismRXS/ros_docker_setup/blob/main/docker-compose.yml"><code class="language-plaintext highlighter-rouge">docker-compose.yml</code></a>
+file contains two separate “services”: <code class="language-plaintext highlighter-rouge">dev</code> and <code class="language-plaintext highlighter-rouge">dev-nvidia</code>. The <code class="language-plaintext highlighter-rouge">dev-nvidia</code>
+service contains additional flags to share the host’s NVIDIA GPU with the
+Docker container. In order to use the <code class="language-plaintext highlighter-rouge">dev-nvidia</code> service, you will need both
+an NVIDIA GPU and you will need to install <code class="language-plaintext highlighter-rouge">nvidia-docker2</code> using NVIDIA’s
+<a href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html">instructions</a>.</p>
+  </li>
+  <li>
+    <p>The <code class="language-plaintext highlighter-rouge">USER_ID</code> and <code class="language-plaintext highlighter-rouge">GROUP_ID</code> variables are passed from <code class="language-plaintext highlighter-rouge">.env</code> to the Docker
+build command via the build arguments:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> args:
+   USER_ID: ${USER_ID:-0}
+   GROUP_ID: ${GROUP_ID:-0}
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>The <code class="language-plaintext highlighter-rouge">network_mode</code> is set to <code class="language-plaintext highlighter-rouge">host</code> to allow the container to have full
+access to the host’s networking system. This is fine for a development
+environment, but should be made more restrictive in a deployed container
+(not our current use-case).</p>
+  </li>
+  <li>
+    <p>The <code class="language-plaintext highlighter-rouge">DISPLAY</code> environment variable display is passed from the host to the
+container to enable GUI applications. In addition, the <code class="language-plaintext highlighter-rouge">.X11-unix</code> and
+<code class="language-plaintext highlighter-rouge">.docker.xauth</code> files are mounted from the host to the container in the
+<code class="language-plaintext highlighter-rouge">volumes</code> section to enable GUIs.</p>
+  </li>
+  <li>
+    <p>The <code class="language-plaintext highlighter-rouge">src</code> directory of the workspace is mounted from the host to the
+container in the <code class="language-plaintext highlighter-rouge">volumes</code> section. It is important to note that the
+<code class="language-plaintext highlighter-rouge">volumes</code> section of the <code class="language-plaintext highlighter-rouge">docker-compose.yml</code> file is only relevant during
+<code class="language-plaintext highlighter-rouge">up</code> and <code class="language-plaintext highlighter-rouge">run</code> commands, not during the <code class="language-plaintext highlighter-rouge">build</code> phase. During build time,
+the code is copied into the Docker image with the <code class="language-plaintext highlighter-rouge">COPY</code> command in the
+<code class="language-plaintext highlighter-rouge">Dockerfile</code>.</p>
+  </li>
+</ol>
+
+<h3 id="dockerfile">Dockerfile</h3>
+
+<ol>
+  <li>
+    <p>The
+<a href="https://github.com/SyllogismRXS/ros_docker_setup/blob/main/Dockerfile"><code class="language-plaintext highlighter-rouge">Dockerfile</code></a>
+contains the instructions to build the ROS Docker image. Our <code class="language-plaintext highlighter-rouge">Dockerfile</code> is
+based on the <code class="language-plaintext highlighter-rouge">osrf/ros:humble-desktop-full</code> Docker image provided by the
+main ROS folks (OSRF, OpenRobotics, etc.) This image already contains an
+installed version of ROS Humble and many of the GUIs and build utilities,
+which we will be using.</p>
+  </li>
+  <li>
+    <p>After declaring the <code class="language-plaintext highlighter-rouge">FROM</code> image and some basic metadata, we install a
+specific Debian package:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> RUN apt-get update \
+     &amp;&amp; apt-get install -y \
+     python3-pip \
+     &amp;&amp; rm -rf /var/lib/apt/lists/*
+</code></pre></div>    </div>
+
+    <p>In your own Dockerfile, you would augment this Debian package installation
+ list to fit your needs.</p>
+  </li>
+  <li>
+    <p>Using the <code class="language-plaintext highlighter-rouge">adduser</code> command, we create a <code class="language-plaintext highlighter-rouge">ros</code> user with the same <code class="language-plaintext highlighter-rouge">USER_ID</code>
+and <code class="language-plaintext highlighter-rouge">GROUP_ID</code> as your host system, which enables GUI applications. In
+addition, the <code class="language-plaintext highlighter-rouge">ros</code> user can issue <code class="language-plaintext highlighter-rouge">sudo</code> commands without a
+password. Again, this is fine for a local development environment, but you
+wouldn’t do this in a deployed Docker image.</p>
+  </li>
+  <li>
+    <p>We source the main ROS system’s setup file (<code class="language-plaintext highlighter-rouge">/opt/ros/humble/setup.bash</code>)
+and colcon’s setup file to the <code class="language-plaintext highlighter-rouge">ros</code> user’s <code class="language-plaintext highlighter-rouge">.bashrc</code>. This provides the
+<code class="language-plaintext highlighter-rouge">ros</code> user with access to the ROS environment every time the container is
+entered.</p>
+  </li>
+  <li>
+    <p>Near the end of the <code class="language-plaintext highlighter-rouge">Dockerfile</code>, the code is copied into the image with the
+<code class="language-plaintext highlighter-rouge">COPY</code> command. The code is copied into the image, so that we can install
+it’s dependencies and make sure it builds deterministically. However, when
+the user runs the <code class="language-plaintext highlighter-rouge">docker compose up</code> command, the code on the host system
+is mounted over the code that was previously copied into the image. This
+allows changes to the repository code to show up immediately inside the
+container for incremental builds.</p>
+  </li>
+  <li>
+    <p>Finally, <code class="language-plaintext highlighter-rouge">rosdep</code> is used to install the repository’s dependencies and
+<code class="language-plaintext highlighter-rouge">colcon</code> is used to perform the workspace build. In addition, the
+workspace’s <code class="language-plaintext highlighter-rouge">local_setup.bash</code> is added to the <code class="language-plaintext highlighter-rouge">ros</code> user’s <code class="language-plaintext highlighter-rouge">.bashrc</code> file,
+so that it’s resources are immediately available when the container is
+entered.</p>
+  </li>
+</ol>
+
+<h2 id="looking-forward">Looking Forward</h2>
+
+<p>In a future post I will describe how I use <a href="https://direnv.net/"><code class="language-plaintext highlighter-rouge">direnv</code></a> to
+quickly open multiple ROS Docker containers.</p>]]></content><author><name>Kevin DeMarco</name></author><category term="ROS" /><category term="Docker" /><category term="docker-compose" /><category term="robotics" /><category term="programming" /><category term="development" /><summary type="html"><![CDATA[If you use the Robot Operating System (ROS) and you are frusterated with system dependencies, incompatible ROS / Linux operating system versions, and non-determinstic builds, then this article is for you.]]></summary></entry><entry><title type="html">A hoarder’s guide to wood storage</title><link href="https://kevindemarco.com/woodworking/storage/2021/02/22/wood-rack.html" rel="alternate" type="text/html" title="A hoarder’s guide to wood storage" /><published>2021-02-22T09:45:00-05:00</published><updated>2021-02-22T09:45:00-05:00</updated><id>https://kevindemarco.com/woodworking/storage/2021/02/22/wood-rack</id><content type="html" xml:base="https://kevindemarco.com/woodworking/storage/2021/02/22/wood-rack.html"><![CDATA[<p>Do you actually have a hoarding problem if you can build efficient storage
 solutions for things that you can’t throw away? I’m not going to answer that
-question because I probably won’t like the answer.&lt;/p&gt;
+question because I probably won’t like the answer.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-02-22-wood-rack/wood-on-ground-1.jpg&quot; alt=&quot;Wood on ground&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-02-22-wood-rack/wood-on-ground-1.jpg" alt="Wood on ground" /></p>
 
-&lt;p&gt;It’s not that I have a hoarding problem. It’s that I don’t like waste. I don’t
+<p>It’s not that I have a hoarding problem. It’s that I don’t like waste. I don’t
 think our throw-away culture is healthy. The best place for a woodworker to
 store their wood is at the lumber yard, but woodworkers will always have extra
 pieces from previous projects. I want to be able to save the cut-offs from
-bigger woodworking projects for smaller projects.&lt;/p&gt;
+bigger woodworking projects for smaller projects.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-02-22-wood-rack/wood-on-ground-2.jpg&quot; alt=&quot;Wood on ground&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-02-22-wood-rack/wood-on-ground-2.jpg" alt="Wood on ground" /></p>
 
-&lt;p&gt;See? I don’t have a problem! I should totally buy more wood to store my other
+<p>See? I don’t have a problem! I should totally buy more wood to store my other
 wood! This
-&lt;a href=&quot;https://jayscustomcreations.com/2014/08/inexpensive-conduit-lumber-rack/&quot;&gt;guy’s&lt;/a&gt;
-wood storage design looks simple enough.&lt;/p&gt;
+<a href="https://jayscustomcreations.com/2014/08/inexpensive-conduit-lumber-rack/">guy’s</a>
+wood storage design looks simple enough.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-02-22-wood-rack/empy-wall.jpg&quot; alt=&quot;Empty wall&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-02-22-wood-rack/empy-wall.jpg" alt="Empty wall" /></p>
 
-&lt;p&gt;This empty white wall is just asking to be the supporting role in a terrifying
-hostage video. We better cover it up with a wood rack.&lt;/p&gt;
+<p>This empty white wall is just asking to be the supporting role in a terrifying
+hostage video. We better cover it up with a wood rack.</p>
 
-&lt;p&gt;I started the project by cutting three 2x4’s to length, with a little 45°
-cut at the bottom to reduce chipping. These will be attached to the wall.&lt;/p&gt;
+<p>I started the project by cutting three 2x4’s to length, with a little 45°
+cut at the bottom to reduce chipping. These will be attached to the wall.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-02-22-wood-rack/twobys.jpg&quot; alt=&quot;Twobys&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-02-22-wood-rack/twobys.jpg" alt="Twobys" /></p>
 
-&lt;p&gt;I then cut the pieces of metal conduit down to size with a reciprocating
-saw.&lt;/p&gt;
+<p>I then cut the pieces of metal conduit down to size with a reciprocating
+saw.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-02-22-wood-rack/cut-conduit.jpg&quot; alt=&quot;Cutting Conduit&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-02-22-wood-rack/cut-conduit.jpg" alt="Cutting Conduit" /></p>
 
-&lt;p&gt;I don’t want to injure my delicate hands, so it’s important to clean up the
+<p>I don’t want to injure my delicate hands, so it’s important to clean up the
 rough metal edges. I don’t have a grinder or stationary belt sander, so I just
-clamped my belt sander to the table.&lt;/p&gt;
+clamped my belt sander to the table.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-02-22-wood-rack/sanding.jpg&quot; alt=&quot;Sanding&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-02-22-wood-rack/sanding.jpg" alt="Sanding" /></p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-02-22-wood-rack/conduit.jpg&quot; alt=&quot;Conduit&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-02-22-wood-rack/conduit.jpg" alt="Conduit" /></p>
 
-&lt;p&gt;To increase the stability of the wood being stored on the rack, I wanted to
+<p>To increase the stability of the wood being stored on the rack, I wanted to
 slightly angle the conduit up. This means that I had to drill the holes into
-the 2x4’s at an angle. The drill press makes this job easy.&lt;/p&gt;
+the 2x4’s at an angle. The drill press makes this job easy.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-02-22-wood-rack/drill-press.jpg&quot; alt=&quot;Drill press&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-02-22-wood-rack/drill-press.jpg" alt="Drill press" /></p>
 
-&lt;p&gt;I knew I kept those two sets of forstner bits for a reason…&lt;/p&gt;
+<p>I knew I kept those two sets of forstner bits for a reason…</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-02-22-wood-rack/drill-hole.jpg&quot; alt=&quot;Drill hole&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-02-22-wood-rack/drill-hole.jpg" alt="Drill hole" /></p>
 
-&lt;p&gt;The hardest part about this project was installing the 2x4 supports on the
+<p>The hardest part about this project was installing the 2x4 supports on the
 cinder block wall. When drilling into a cinder block wall, the hammer drill
 makes a high-pitched crunching noise that makes me question home ownership and
-the integrity of the foundation.&lt;/p&gt;
+the integrity of the foundation.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-02-22-wood-rack/hammer-drill.jpg&quot; alt=&quot;Hammer drill&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-02-22-wood-rack/hammer-drill.jpg" alt="Hammer drill" /></p>
 
-&lt;p&gt;I had to use a hammer drill to put holes in the cinder blocks to accept the
-&lt;a href=&quot;https://www.tapcon.com/&quot;&gt;Tapcon&lt;/a&gt; screws I used to hold the wood against the
+<p>I had to use a hammer drill to put holes in the cinder blocks to accept the
+<a href="https://www.tapcon.com/">Tapcon</a> screws I used to hold the wood against the
 wall. Despite following the instructions for the Tapcon screws, it seems that
 the suggested masonry drill bit sizes never work with their anchors. I don’t
 know what’s wrong. It could be that maybe I’m illiterate, but Tapcon uses color
 codes to match the suggested drill bits size with the appropriate anchors, so
-that’s not it.&lt;/p&gt;
+that’s not it.</p>
 
-&lt;p&gt;After a few hours of white-knuckling the hammer drill and grinding my teeth, I
-was able to get three good anchors through each 2x4 and into the wall.&lt;/p&gt;
+<p>After a few hours of white-knuckling the hammer drill and grinding my teeth, I
+was able to get three good anchors through each 2x4 and into the wall.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-02-22-wood-rack/wood-rack-empty.jpg&quot; alt=&quot;Empty Rack&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-02-22-wood-rack/wood-rack-empty.jpg" alt="Empty Rack" /></p>
 
-&lt;p&gt;To make sure the rack will hold the pieces of wood level, use a bubble level
+<p>To make sure the rack will hold the pieces of wood level, use a bubble level
 across the conduit between two 2x4’s while drilling the holes for the
 screws. This will ensure that the stored wood will distribute its weight evenly
-across the supports.&lt;/p&gt;
+across the supports.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-02-22-wood-rack/wood-rack.jpg&quot; alt=&quot;Wood Rack&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-02-22-wood-rack/wood-rack.jpg" alt="Wood Rack" /></p>
 
-&lt;p&gt;Yes, that’s satisfying. My shame is no longer on the ground, but proudly
-displayed on the wall.&lt;/p&gt;
+<p>Yes, that’s satisfying. My shame is no longer on the ground, but proudly
+displayed on the wall.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-02-22-wood-rack/wood-on-rack-1.jpg&quot; alt=&quot;Wood on Rack&quot; /&gt;&lt;/p&gt;</content><author><name>Kevin DeMarco</name></author><category term="woodworking" /><category term="storage" /><summary type="html">Do you actually have a hoarding problem if you can build efficient storage solutions for things that you can’t throw away? I’m not going to answer that question because I probably won’t like the answer.</summary></entry><entry><title type="html">Bamboomba: The sort of wooden robot.</title><link href="https://kevindemarco.com/robotics/ros/woodworking/2021/01/19/bamboomba-part-1.html" rel="alternate" type="text/html" title="Bamboomba: The sort of wooden robot." /><published>2021-01-19T11:00:00-05:00</published><updated>2021-01-19T11:00:00-05:00</updated><id>https://kevindemarco.com/robotics/ros/woodworking/2021/01/19/bamboomba-part-1</id><content type="html" xml:base="https://kevindemarco.com/robotics/ros/woodworking/2021/01/19/bamboomba-part-1.html">&lt;p&gt;What do you get when you cross a Roomba…&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-02-22-wood-rack/wood-on-rack-1.jpg" alt="Wood on Rack" /></p>]]></content><author><name>Kevin DeMarco</name></author><category term="woodworking" /><category term="storage" /><summary type="html"><![CDATA[Do you actually have a hoarding problem if you can build efficient storage solutions for things that you can’t throw away? I’m not going to answer that question because I probably won’t like the answer.]]></summary></entry><entry><title type="html">Bamboomba: The sort of wooden robot.</title><link href="https://kevindemarco.com/robotics/ros/woodworking/2021/01/19/bamboomba-part-1.html" rel="alternate" type="text/html" title="Bamboomba: The sort of wooden robot." /><published>2021-01-19T11:00:00-05:00</published><updated>2021-01-19T11:00:00-05:00</updated><id>https://kevindemarco.com/robotics/ros/woodworking/2021/01/19/bamboomba-part-1</id><content type="html" xml:base="https://kevindemarco.com/robotics/ros/woodworking/2021/01/19/bamboomba-part-1.html"><![CDATA[<p>What do you get when you cross a Roomba…</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/apart_roomba.jpg&quot; alt=&quot;Apart Roomba&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/apart_roomba.jpg" alt="Apart Roomba" /></p>
 
-&lt;p&gt;with scrap wood?&lt;/p&gt;
+<p>with scrap wood?</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/scroll-saw-wood.jpg&quot; alt=&quot;Wood with scroll saw&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/scroll-saw-wood.jpg" alt="Wood with scroll saw" /></p>
 
-&lt;p&gt;You get… Bamboomba!&lt;/p&gt;
+<p>You get… Bamboomba!</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/bamboomba.jpg&quot; alt=&quot;Bamboomba&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/bamboomba.jpg" alt="Bamboomba" /></p>
 
-&lt;p&gt;You might be wondering why Kevin, being the professional researcher who he is,
+<p>You might be wondering why Kevin, being the professional researcher who he is,
 decided to build a half-wooden monstrosity with an obsolete robot base.  Didn’t
-Kevin go to college for thirteen years or something? Why don’t you just &lt;em&gt;buy&lt;/em&gt; a
-robot, Kevin? How is this robot going to help you pay your mortgage? Kevin.&lt;/p&gt;
+Kevin go to college for thirteen years or something? Why don’t you just <em>buy</em> a
+robot, Kevin? How is this robot going to help you pay your mortgage? Kevin.</p>
 
-&lt;p&gt;Jeeeeeez, stop hassling me. I built Bamboomba to show what is possible with a
-couple of low-cost sensors and to learn about the new features in the &lt;a href=&quot;https://index.ros.org/doc/ros2/&quot;&gt;Robot
-Operating System (ROS) 2&lt;/a&gt;
-&lt;a href=&quot;https://navigation.ros.org/&quot;&gt;Navigation2&lt;/a&gt; software stack. Also, I think it’s a
-really funny name.&lt;/p&gt;
+<p>Jeeeeeez, stop hassling me. I built Bamboomba to show what is possible with a
+couple of low-cost sensors and to learn about the new features in the <a href="https://index.ros.org/doc/ros2/">Robot
+Operating System (ROS) 2</a>
+<a href="https://navigation.ros.org/">Navigation2</a> software stack. Also, I think it’s a
+really funny name.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/ruler.jpg&quot; alt=&quot;Ruler&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/ruler.jpg" alt="Ruler" /></p>
 
-&lt;p&gt;To be completely honest, when my friend and I co-founded &lt;a href=&quot;https://www.rifrobotics.com&quot;&gt;RIF
-Robotics&lt;/a&gt; in the fall of 2020, we submitted an
+<p>To be completely honest, when my friend and I co-founded <a href="https://www.rifrobotics.com">RIF
+Robotics</a> in the fall of 2020, we submitted an
 application to Clearpath Robotics’
-&lt;a href=&quot;https://clearpathrobotics.com/blog/2020/11/winners-of-the-2020-partnerbot-grant-program-announced-putting-robotic-platforms-in-researchers-hands/&quot;&gt;PartnerBot&lt;/a&gt;
+<a href="https://clearpathrobotics.com/blog/2020/11/winners-of-the-2020-partnerbot-grant-program-announced-putting-robotic-platforms-in-researchers-hands/">PartnerBot</a>
 program and we won! That means we will be receiving an industrial-grade indoor
 ground robot in February 2021 named
-&lt;a href=&quot;https://clearpathrobotics.com/dingo-indoor-mobile-robot/&quot;&gt;Dingo&lt;/a&gt;.&lt;/p&gt;
+<a href="https://clearpathrobotics.com/dingo-indoor-mobile-robot/">Dingo</a>.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/dingo.png&quot; alt=&quot;Bamboomba&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/dingo.png" alt="Bamboomba" /></p>
 
-&lt;p&gt;We will be using the ROS2 and Navigation2 software stacks to control Dingo and
+<p>We will be using the ROS2 and Navigation2 software stacks to control Dingo and
 build maps of the environment with a LIDAR, but I wanted to get a head start on
 the software development, so I built Bamboomba as a surrogate platform. Both
 Bamboomba and Dingo will have the same sensor suite and software stack, so
 moving between the two platforms should be fairly seamless. I do know what I’m
-doing, right? The sensor suite consists of an &lt;a href=&quot;https://www.intelrealsense.com/depth-camera-d435/&quot;&gt;Intel RealSense
-D435i&lt;/a&gt; and an &lt;a href=&quot;https://www.slamtec.com/en/Lidar/A2&quot;&gt;RP LIDAR
-A2&lt;/a&gt;.&lt;/p&gt;
+doing, right? The sensor suite consists of an <a href="https://www.intelrealsense.com/depth-camera-d435/">Intel RealSense
+D435i</a> and an <a href="https://www.slamtec.com/en/Lidar/A2">RP LIDAR
+A2</a>.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/sensor-suite.jpg&quot; alt=&quot;Sensors&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/sensor-suite.jpg" alt="Sensors" /></p>
 
-&lt;p&gt;The D435i provides an inertial measurement unit (i.e., measurements of linear
+<p>The D435i provides an inertial measurement unit (i.e., measurements of linear
 and rotational accelerations), a 2D RGB image, and a 3D point cloud of the
 environment. The RP LIDAR uses a rotating laser to measure distances to objects
 around the robot in 360°. There will be more on these sensors and how
@@ -134,23 +419,23 @@ they help the robot to build maps and navigate around obstacles in a future
 post. The important part to note at this moment is that I hand cut and drilled
 the mounts for these professional sensors without using any CAD software or 3D
 printers. One of my industrial design friends said that he calls anything not
-cut by a &lt;a href=&quot;https://en.wikipedia.org/wiki/Numerical_control&quot;&gt;CNC&lt;/a&gt; machine
+cut by a <a href="https://en.wikipedia.org/wiki/Numerical_control">CNC</a> machine
 “folksy.”  Like folk music. Not written down. I prefer the term, “Artisinal
-Robotics.”&lt;/p&gt;
+Robotics.”</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/artisinal-robotics.gif&quot; alt=&quot;Artisinal Robotics&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/artisinal-robotics.gif" alt="Artisinal Robotics" /></p>
 
-&lt;p&gt;That GIF isn’t from a random woodworking project. I was fine-tuning the
+<p>That GIF isn’t from a random woodworking project. I was fine-tuning the
 mounting block for the LIDAR on the shooting board that I made with a chisel
-and hand router.&lt;/p&gt;
+and hand router.</p>
 
-&lt;p&gt;Bamboomba is loosely based on the
-&lt;a href=&quot;https://www.turtlebot.com/turtlebot2/&quot;&gt;Turtlebot&lt;/a&gt; design, which has been used
-extensively in the open source and academic robotics communities.&lt;/p&gt;
+<p>Bamboomba is loosely based on the
+<a href="https://www.turtlebot.com/turtlebot2/">Turtlebot</a> design, which has been used
+extensively in the open source and academic robotics communities.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/turtlebot.png&quot; alt=&quot;Turtlebot&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/turtlebot.png" alt="Turtlebot" /></p>
 
-&lt;p&gt;But Bamboomba is a lot cheaper, only took one day to build from scratch, and,
+<p>But Bamboomba is a lot cheaper, only took one day to build from scratch, and,
 literally, can’t be faithfully reproduced! The main idea I took from the
 Turtlebot was the multiple levels offset by aluminum stand-offs. This sparse
 design allows a roboticist to attach random sensors to the platforms and a
@@ -159,24 +444,24 @@ to cut the platforms out of spare plywood using my scroll saw. I didn’t want t
 order aluminum stand-offs from an expensive mechanical parts store and, more
 importantly, wait two weeks for the parts to arrive, so I drove five minutes to
 Lowe’s and stared at the mechanical fasteners section for an hour until I came
-up with the following design for the stand-offs:&lt;/p&gt;
+up with the following design for the stand-offs:</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/standoffs.jpg&quot; alt=&quot;Stand offs&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/standoffs.jpg" alt="Stand offs" /></p>
 
-&lt;p&gt;The aluminum rod cost $10 and I was able to cut it precisely with a pipe cutter:&lt;/p&gt;
+<p>The aluminum rod cost $10 and I was able to cut it precisely with a pipe cutter:</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/cutting.jpg&quot; alt=&quot;Cutting&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/cutting.jpg" alt="Cutting" /></p>
 
-&lt;p&gt;Once the aluminum rod stand-offs were cut to size, it was fairly easy to
+<p>Once the aluminum rod stand-offs were cut to size, it was fairly easy to
 assemble the platforms. The most tedious part was determining where to drill
 the holes for the screws to pass through without a template. This involved
 drawing intersecting lines to find the midpoint between mounting screw
 locations and transferring hole points by laying the wooden platforms directly
-on top of each other. If you look closely, you can see my layout lines.&lt;/p&gt;
+on top of each other. If you look closely, you can see my layout lines.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/platforms.jpg&quot; alt=&quot;Standoffs&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/platforms.jpg" alt="Standoffs" /></p>
 
-&lt;p&gt;When designing a ground robot with a single planar LIDAR, one of the most
+<p>When designing a ground robot with a single planar LIDAR, one of the most
 difficult design decisions is where to place the LIDAR. If the LIDAR is mounted
 at a low-point on the robot, it will ensure that the LIDAR doesn’t miss any
 obstacles close to the ground. However, if the LIDAR is close to the ground,
@@ -191,45 +476,45 @@ and the top platforms, so that I could experiment with mounting the LIDAR at
 two different heights. When the LIDAR is in the bottom configuration, I route
 the LIDAR and serial cables behind the aluminum stand-off to reduce the
 obstructions in the LIDAR’s field-of-view. The cables are beautifully secured
-in place with zip ties.&lt;/p&gt;
+in place with zip ties.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/lidar-bottom.jpg&quot; alt=&quot;LIDAR Bottom&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/lidar-bottom.jpg" alt="LIDAR Bottom" /></p>
 
-&lt;p&gt;When the LIDAR is mounted in the top configuration, it has to be raised
+<p>When the LIDAR is mounted in the top configuration, it has to be raised
 slightly to ensure that its laser is not obstructed by the RealSense
 camera. This is done with the 3/4” piece of wood that played the starring role
-in the previous animated GIF.&lt;/p&gt;
+in the previous animated GIF.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/angle-view.jpg&quot; alt=&quot;Angle View&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/angle-view.jpg" alt="Angle View" /></p>
 
-&lt;p&gt;Finally, the laptop is mounted to Bamboomba with velcro to make it easy to remove.&lt;/p&gt;
+<p>Finally, the laptop is mounted to Bamboomba with velcro to make it easy to remove.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/front-view.jpg&quot; alt=&quot;Front View&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/front-view.jpg" alt="Front View" /></p>
 
-&lt;p&gt;I hope this article will inspire others to hack their own Roombas into wooden
-abominations. There are &lt;a href=&quot;https://github.com/tork-a/roomblock&quot;&gt;other&lt;/a&gt; ways to
-&lt;a href=&quot;https://www.turtlebot.com/build/&quot;&gt;build&lt;/a&gt; or
-&lt;a href=&quot;https://dabit.industries/products/turtlebot-2&quot;&gt;buy&lt;/a&gt; a similar robot, but I
+<p>I hope this article will inspire others to hack their own Roombas into wooden
+abominations. There are <a href="https://github.com/tork-a/roomblock">other</a> ways to
+<a href="https://www.turtlebot.com/build/">build</a> or
+<a href="https://dabit.industries/products/turtlebot-2">buy</a> a similar robot, but I
 like mine best. Bamboomba’s platform is made from readily accessible parts that
-can be put together in a day with some basic cutting tools.&lt;/p&gt;
+can be put together in a day with some basic cutting tools.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/parts-on-bench.jpg&quot; alt=&quot;Parts&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-19-bamboomba-part-1/parts-on-bench.jpg" alt="Parts" /></p>
 
-&lt;p&gt;I’ve got to come clean about something that has really been bothering me. The
-robot’s base is not really a Roomba. It’s an &lt;a href=&quot;https://en.wikipedia.org/wiki/IRobot_Create&quot;&gt;iRobot
-Create&lt;/a&gt;. But the bamboo + Roomba
-name was &lt;em&gt;soooo&lt;/em&gt; good and it’s basically the Roomba without the vacuum. My
+<p>I’ve got to come clean about something that has really been bothering me. The
+robot’s base is not really a Roomba. It’s an <a href="https://en.wikipedia.org/wiki/IRobot_Create">iRobot
+Create</a>. But the bamboo + Roomba
+name was <em>soooo</em> good and it’s basically the Roomba without the vacuum. My
 roommate from college gifted me the Create back in 2008 for being in his
 wedding when I had not even considered studying robotics in graduate school. He
-knew what I wanted.&lt;/p&gt;
+knew what I wanted.</p>
 
-&lt;p&gt;In a future post, I will describe how the ROS2 and Navigation2 software stacks
+<p>In a future post, I will describe how the ROS2 and Navigation2 software stacks
 are used to build maps and navigate around obstacles in
-the environment with the LIDAR.&lt;/p&gt;
+the environment with the LIDAR.</p>
 
-&lt;p&gt;Thanks for following along.&lt;/p&gt;</content><author><name>Kevin DeMarco</name></author><category term="robotics" /><category term="ROS" /><category term="woodworking" /><summary type="html">What do you get when you cross a Roomba…</summary></entry><entry><title type="html">A Handcrafted Dovetail Box</title><link href="https://kevindemarco.com/woodworking/handtools/box/2021/01/15/dovetail-box.html" rel="alternate" type="text/html" title="A Handcrafted Dovetail Box" /><published>2021-01-15T09:45:00-05:00</published><updated>2021-01-15T09:45:00-05:00</updated><id>https://kevindemarco.com/woodworking/handtools/box/2021/01/15/dovetail-box</id><content type="html" xml:base="https://kevindemarco.com/woodworking/handtools/box/2021/01/15/dovetail-box.html">&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-15-dovetail-box/DSC_0520.JPG&quot; alt=&quot;Dovetail box front&quot; /&gt;&lt;/p&gt;
+<p>Thanks for following along.</p>]]></content><author><name>Kevin DeMarco</name></author><category term="robotics" /><category term="ROS" /><category term="woodworking" /><summary type="html"><![CDATA[What do you get when you cross a Roomba…]]></summary></entry><entry><title type="html">A Handcrafted Dovetail Box</title><link href="https://kevindemarco.com/woodworking/handtools/box/2021/01/15/dovetail-box.html" rel="alternate" type="text/html" title="A Handcrafted Dovetail Box" /><published>2021-01-15T09:45:00-05:00</published><updated>2021-01-15T09:45:00-05:00</updated><id>https://kevindemarco.com/woodworking/handtools/box/2021/01/15/dovetail-box</id><content type="html" xml:base="https://kevindemarco.com/woodworking/handtools/box/2021/01/15/dovetail-box.html"><![CDATA[<p><img src="https://kevindemarco.com/assets/images/2021-01-15-dovetail-box/DSC_0520.JPG" alt="Dovetail box front" /></p>
 
-&lt;p&gt;My educational background is in Electrical and Computer Engineering with a
+<p>My educational background is in Electrical and Computer Engineering with a
 strong bent towards Computer Science. This means that I spend most of my day
 typing on a computer, reading technical papers, designing systems, writing
 code, and communicating with team members. Even when I am designing mechanical
@@ -241,95 +526,95 @@ provides the physical connection to the world that so many computer-addicted
 folks desire. I can’t tell you how many times I’ve come across a programmer’s
 blog who also listed “woodworking” as one of their hobbies. I should probably
 start a Meetup.com group for these people (myself included). Throw in
-“bicycling” and my target support group is pretty well defined.&lt;/p&gt;
+“bicycling” and my target support group is pretty well defined.</p>
 
-&lt;figure class=&quot;&quot;&gt;
-  &lt;img src=&quot;/assets/images/2021-01-15-dovetail-box/venn-diagram.png&quot; alt=&quot;One of us. One of us.&quot; /&gt;&lt;figcaption&gt;
+<figure class="">
+  <img src="/assets/images/2021-01-15-dovetail-box/venn-diagram.png" alt="One of us. One of us." /><figcaption>
       One of us. One of us.
 
-    &lt;/figcaption&gt;&lt;/figure&gt;
+    </figcaption></figure>
 
-&lt;p&gt;Now that I have sufficiently pigeonholed myself, I can describe the dovetail
+<p>Now that I have sufficiently pigeonholed myself, I can describe the dovetail
 box. I built this dovetail box as a Christmas present for my father. With the
 2020 pandemic in full-force, which made visiting family members irresponsible,
 I decided that a hand-made gift was better than feeding the online e-commerce
 beast. After I bought the lumber from a store, I built it completely with hand
-tools, no electricity required.&lt;/p&gt;
+tools, no electricity required.</p>
 
-&lt;figure class=&quot;&quot;&gt;
-  &lt;img src=&quot;/assets/images/2021-01-15-dovetail-box/handtools.jpg&quot; alt=&quot;Hand tools&quot; /&gt;&lt;figcaption&gt;
+<figure class="">
+  <img src="/assets/images/2021-01-15-dovetail-box/handtools.jpg" alt="Hand tools" /><figcaption>
       Saws, blades, steel, and blood (my own).
 
-    &lt;/figcaption&gt;&lt;/figure&gt;
+    </figcaption></figure>
 
-&lt;p&gt;The box is made from 3/4 inch poplar that I purchased from a local hardware
+<p>The box is made from 3/4 inch poplar that I purchased from a local hardware
 store. Poplar is a nice wood for beginner hand tool woodworkers. It is
 considered a “hard” wood, which means it is less likely to splinter and shatter
 like pine, but it won’t dull the edges of your blades as quickly as other hard
 woods, such as red oak. Also, poplar is widely available in the big box stores
 at a reasonable price. Since my 7th grade wood shop class didn’t teach us how
 to use traditional hand tools, I learned from the masters on YouTube. When
-possible, I subscribe to the &lt;a href=&quot;https://www.youtube.com/user/PaulSellersWoodwork&quot;&gt;Paul
-Sellers&lt;/a&gt; school of thought
+possible, I subscribe to the <a href="https://www.youtube.com/user/PaulSellersWoodwork">Paul
+Sellers</a> school of thought
 when working wood. Many of the techniques that I used to build this dovetail
-box were from his video on the &lt;a href=&quot;https://youtu.be/SibYJ8JtOo4&quot;&gt;same
-subject&lt;/a&gt;.&lt;/p&gt;
+box were from his video on the <a href="https://youtu.be/SibYJ8JtOo4">same
+subject</a>.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-15-dovetail-box/DSC_0531.JPG&quot; alt=&quot;Side detail 2&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-15-dovetail-box/DSC_0531.JPG" alt="Side detail 2" /></p>
 
-&lt;p&gt;What is both appealing and intimidating about Paul Seller’s approach to
+<p>What is both appealing and intimidating about Paul Seller’s approach to
 woodworking is that it requires practice, artistry, and learned skills. Anyone
 can read learn how to make straight cuts on a table saw in a matter of minutes,
 but learning how to set and use a plane to flatten a piece of wood could take
 months or years. For Paul Sellers, the woodworker’s skill with the saw or plane
 can overcome any imperfections in the wood or tool - “A Good Craftsman Never
 Blames His Tools” (of course this statement has multiple
-&lt;a href=&quot;http://www.javiercasas.com/articles/good-craftsman-never-blames-tools/&quot;&gt;interpretations&lt;/a&gt;). From
+<a href="http://www.javiercasas.com/articles/good-craftsman-never-blames-tools/">interpretations</a>). From
 my perspective, woodworking is a hobby that I use to escape from the technical
 perfection that is required in my daily profession. I enjoyed rounding over the
-edges of this box with a hand plane, which felt like free-hand sculpting.&lt;/p&gt;
+edges of this box with a hand plane, which felt like free-hand sculpting.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-15-dovetail-box/DSC_0524.JPG&quot; alt=&quot;Side detail 1&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-15-dovetail-box/DSC_0524.JPG" alt="Side detail 1" /></p>
 
-&lt;p&gt;I have also borrowed techniques from &lt;a href=&quot;https://www.youtube.com/watch?v=ibyTMTLjaq8&amp;amp;t=122s&quot;&gt;David
-Barron&lt;/a&gt;. I prefer his
-technique of using a fine-toothed &lt;a href=&quot;https://www.highlandwoodworking.com/knew-concepts-5in-woodworkers-fretsaw.aspx&quot;&gt;coping
-saw&lt;/a&gt;
+<p>I have also borrowed techniques from <a href="https://www.youtube.com/watch?v=ibyTMTLjaq8&amp;t=122s">David
+Barron</a>. I prefer his
+technique of using a fine-toothed <a href="https://www.highlandwoodworking.com/knew-concepts-5in-woodworkers-fretsaw.aspx">coping
+saw</a>
 to cut the waste from dovetails instead of “chopping” them with a chisel, which
 Paul Sellers prefers. Still, I often use Paul Sellers’ technique for setting
 and installing hinges for box lids and doors. The accuracy on these recessed
-hinges, without using a measuring device or jig, is quite satisfying.&lt;/p&gt;
+hinges, without using a measuring device or jig, is quite satisfying.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-15-dovetail-box/DSC_0522.JPG&quot; alt=&quot;Box hinges&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-15-dovetail-box/DSC_0522.JPG" alt="Box hinges" /></p>
 
-&lt;p&gt;Poplar isn’t known for having nicely “figured” wood. However, I was able to
+<p>Poplar isn’t known for having nicely “figured” wood. However, I was able to
 identify an interesting feature on this poplar and I used it on the lid of the
-box.&lt;/p&gt;
+box.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2021-01-15-dovetail-box/DSC_0526.JPG&quot; alt=&quot;Top detail&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2021-01-15-dovetail-box/DSC_0526.JPG" alt="Top detail" /></p>
 
-&lt;p&gt;To finish the box, I used a single coat of &lt;a href=&quot;https://www.lowes.com/pd/Minwax-Wood-Finish-Satin-Colonial-Maple-Oil-based-Interior-Stain-Actual-Net-Contents-8-fl-oz/999914527&quot;&gt;colonial maple
-stain&lt;/a&gt;
-and two coats of &lt;a href=&quot;https://www.lowes.com/pd/WATCO-Brown-Danish-Oil-Actual-Net-Contents-16-fl-oz/3142391?cm_mmc=shp-_-c-_-prd-_-pnt-_-google-_-lia-_-219-_-interiorstains-_-3142391-_-0&amp;amp;placeholder=null&amp;amp;ds_rl=1286981&amp;amp;gclid=CjwKCAiAl4WABhAJEiwATUnEF7em7_JC6P0BLgOs2R5DDnbi1EAVwbkwTVPzFNpFH6uf2b3KiRXH0hoCgR8QAvD_BwE&amp;amp;gclsrc=aw.ds&quot;&gt;danish
-oil&lt;/a&gt;.&lt;/p&gt;
+<p>To finish the box, I used a single coat of <a href="https://www.lowes.com/pd/Minwax-Wood-Finish-Satin-Colonial-Maple-Oil-based-Interior-Stain-Actual-Net-Contents-8-fl-oz/999914527">colonial maple
+stain</a>
+and two coats of <a href="https://www.lowes.com/pd/WATCO-Brown-Danish-Oil-Actual-Net-Contents-16-fl-oz/3142391?cm_mmc=shp-_-c-_-prd-_-pnt-_-google-_-lia-_-219-_-interiorstains-_-3142391-_-0&amp;placeholder=null&amp;ds_rl=1286981&amp;gclid=CjwKCAiAl4WABhAJEiwATUnEF7em7_JC6P0BLgOs2R5DDnbi1EAVwbkwTVPzFNpFH6uf2b3KiRXH0hoCgR8QAvD_BwE&amp;gclsrc=aw.ds">danish
+oil</a>.</p>
 
-&lt;p&gt;When the lock down of 2020 began, I made myself a commitment to improve my hand
+<p>When the lock down of 2020 began, I made myself a commitment to improve my hand
 tool working skills. Getting better at using hand tools is very similar to
-getting better at playing a musical instrument (c.f. &lt;a href=&quot;https://www.goodreads.com/book/show/18886619-the-foundations-of-better-woodworking&quot;&gt;Jeff
-Miller&lt;/a&gt;]). Both
+getting better at playing a musical instrument (c.f. <a href="https://www.goodreads.com/book/show/18886619-the-foundations-of-better-woodworking">Jeff
+Miller</a>]). Both
 activities require constant regular practice and assessment. Excuse me while I
-go make 365 dovetail boxes.&lt;/p&gt;</content><author><name>Kevin DeMarco</name></author><category term="woodworking" /><category term="handtools" /><category term="box" /><summary type="html"></summary></entry><entry><title type="html">Remote Pair Programming via SSH and wemux on Linux</title><link href="https://kevindemarco.com/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming.html" rel="alternate" type="text/html" title="Remote Pair Programming via SSH and wemux on Linux" /><published>2020-03-25T23:11:13-04:00</published><updated>2020-03-25T23:11:13-04:00</updated><id>https://kevindemarco.com/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming</id><content type="html" xml:base="https://kevindemarco.com/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming.html">&lt;p&gt;There are several benefits to the use of pair programming in the software
+go make 365 dovetail boxes.</p>]]></content><author><name>Kevin DeMarco</name></author><category term="woodworking" /><category term="handtools" /><category term="box" /><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">Remote Pair Programming via SSH and wemux on Linux</title><link href="https://kevindemarco.com/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming.html" rel="alternate" type="text/html" title="Remote Pair Programming via SSH and wemux on Linux" /><published>2020-03-25T23:11:13-04:00</published><updated>2020-03-25T23:11:13-04:00</updated><id>https://kevindemarco.com/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming</id><content type="html" xml:base="https://kevindemarco.com/ssh/programming/ngrok/tmux/wemux/terminal/2020/03/25/pair-programming.html"><![CDATA[<p>There are several benefits to the use of pair programming in the software
 development process: fewer mistakes, better understanding of the codebase
-across multiple developers, and improved team cohesiveness (cf. &lt;a href=&quot;https://www.verypossible.com/blog/pros-and-cons-of-pair-programming&quot;&gt;The Pros and
-Cons of Pair Programming&lt;/a&gt;). Personally,
+across multiple developers, and improved team cohesiveness (cf. <a href="https://www.verypossible.com/blog/pros-and-cons-of-pair-programming">The Pros and
+Cons of Pair Programming</a>). Personally,
 I have found pair programming can be especially useful for
 training. Experienced developers forget the multitude of tiny stumbling blocks
 that less experienced developers encounter on a daily basis. Also, it can be
 helpful for less experienced developers to see how experienced developers have
 customized their tools for increased productivity (e.g., terminal setup, emacs
-config, vim config, etc.)&lt;/p&gt;
+config, vim config, etc.)</p>
 
-&lt;p&gt;However, when working remotely, pair programming can be difficult without a
+<p>However, when working remotely, pair programming can be difficult without a
 simple and secure process. In this post, I describe the steps required to setup
 a secure pair programming process in which one (remote) developer SSH’s into
 another (host) developer’s Linux machine. The host developer will be able to
@@ -338,185 +623,185 @@ keyboard entries made by the remote developer. We will also configure the host
 machine such that the remote user will not be able to SSH into the host machine
 unless the host developer runs a specific terminal sharing program (i.e.,
 wemux). While this setup is fairly secure, you shouldn’t grant access to remote
-developers that you don’t trust.&lt;/p&gt;
+developers that you don’t trust.</p>
 
-&lt;h2 id=&quot;system-overview&quot;&gt;System Overview&lt;/h2&gt;
+<h2 id="system-overview">System Overview</h2>
 
-&lt;p&gt;A high-level diagram of the setup is shown in the following figure.&lt;/p&gt;
+<p>A high-level diagram of the setup is shown in the following figure.</p>
 
-&lt;p&gt;&lt;img src=&quot;https://kevindemarco.com/assets/images/2020-03-25-pair-programming/pair-ssh-diagram.jpg&quot; alt=&quot;Pair SSH Diagram&quot; /&gt;&lt;/p&gt;
+<p><img src="https://kevindemarco.com/assets/images/2020-03-25-pair-programming/pair-ssh-diagram.jpg" alt="Pair SSH Diagram" /></p>
 
-&lt;p&gt;As shown in the diagram, the pair programming server is initiated by the host
-developer running the &lt;code class=&quot;highlighter-rouge&quot;&gt;wemux&lt;/code&gt; command. The remote developer then uses SSH to
-log into the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; Linux user on the host machine. The pair user’s
-&lt;code class=&quot;highlighter-rouge&quot;&gt;~/.profile&lt;/code&gt; file is configured to run the command, &lt;code class=&quot;highlighter-rouge&quot;&gt;wemux pair; exit&lt;/code&gt;, which
+<p>As shown in the diagram, the pair programming server is initiated by the host
+developer running the <code class="language-plaintext highlighter-rouge">wemux</code> command. The remote developer then uses SSH to
+log into the <code class="language-plaintext highlighter-rouge">pair</code> Linux user on the host machine. The pair user’s
+<code class="language-plaintext highlighter-rouge">~/.profile</code> file is configured to run the command, <code class="language-plaintext highlighter-rouge">wemux pair; exit</code>, which
 forces the remote user to immediately join the wemux session upon login and
 exit the SSH session when the wemux session ends. Finally, to make it easier to
 SSH into computers that are behind firewalls, proxies, and VPN servers, the
-host machine will use &lt;code class=&quot;highlighter-rouge&quot;&gt;ngrok&lt;/code&gt; to provide an SSH tunnel (cf. &lt;a href=&quot;https://ngrok.com/&quot;&gt;ngrok&lt;/a&gt;).&lt;/p&gt;
+host machine will use <code class="language-plaintext highlighter-rouge">ngrok</code> to provide an SSH tunnel (cf. <a href="https://ngrok.com/">ngrok</a>).</p>
 
-&lt;h2 id=&quot;one-time-host-linux-machine-configuration&quot;&gt;One-Time Host Linux Machine Configuration&lt;/h2&gt;
+<h2 id="one-time-host-linux-machine-configuration">One-Time Host Linux Machine Configuration</h2>
 
-&lt;h3 id=&quot;install-package-dependencies&quot;&gt;Install Package Dependencies&lt;/h3&gt;
+<h3 id="install-package-dependencies">Install Package Dependencies</h3>
 
-&lt;p&gt;Install the SSH server, tmux, and the snap package manager with your system’s
-package manager:&lt;/p&gt;
+<p>Install the SSH server, tmux, and the snap package manager with your system’s
+package manager:</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;openssh-server tmux snapd&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo </span>apt-get <span class="nb">install </span>openssh-server tmux snapd</code></pre></figure>
 
-&lt;h3 id=&quot;install-the-ngrok-snap-package&quot;&gt;Install the ngrok snap package&lt;/h3&gt;
+<h3 id="install-the-ngrok-snap-package">Install the ngrok snap package</h3>
 
-&lt;p&gt;&lt;a href=&quot;https://ngrok.com/&quot;&gt;ngrok&lt;/a&gt; will be used to create an SSH tunnel to the host machine that
-can be securely accessed behind firewalls and VPN servers.&lt;/p&gt;
+<p><a href="https://ngrok.com/">ngrok</a> will be used to create an SSH tunnel to the host machine that
+can be securely accessed behind firewalls and VPN servers.</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;snap &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;ngrok&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo </span>snap <span class="nb">install </span>ngrok</code></pre></figure>
 
-&lt;h4 id=&quot;configure-ngrok&quot;&gt;Configure ngrok&lt;/h4&gt;
+<h4 id="configure-ngrok">Configure ngrok</h4>
 
-&lt;p&gt;Create an ngrok account:
-&lt;a href=&quot;https://dashboard.ngrok.com/login&quot;&gt;https://dashboard.ngrok.com/login&lt;/a&gt;&lt;/p&gt;
+<p>Create an ngrok account:
+<a href="https://dashboard.ngrok.com/login">https://dashboard.ngrok.com/login</a></p>
 
-&lt;p&gt;After creating your ngrok account, you will need to use the tunnel
+<p>After creating your ngrok account, you will need to use the tunnel
 authorization token in your ngrok account to authorize your machine. Copy the
 authorization token from the website,
-&lt;a href=&quot;https://dashboard.ngrok.com/auth&quot;&gt;https://dashboard.ngrok.com/auth&lt;/a&gt;, and run
-the following command, where &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;authorization-token&amp;gt;&lt;/code&gt; is the copied token:&lt;/p&gt;
+<a href="https://dashboard.ngrok.com/auth">https://dashboard.ngrok.com/auth</a>, and run
+the following command, where <code class="language-plaintext highlighter-rouge">&lt;authorization-token&gt;</code> is the copied token:</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ngrok authtoken &amp;lt;authorization-token&amp;gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ngrok authtoken &lt;authorization-token&gt;</code></pre></figure>
 
-&lt;h3 id=&quot;install-and-configure-wemux&quot;&gt;Install and Configure wemux&lt;/h3&gt;
+<h3 id="install-and-configure-wemux">Install and Configure wemux</h3>
 
-&lt;p&gt;&lt;a href=&quot;https://github.com/zolrath/wemux&quot;&gt;wemux&lt;/a&gt; is a project that allows multiple
+<p><a href="https://github.com/zolrath/wemux">wemux</a> is a project that allows multiple
 developers to directly collaborate on the same command line. (wemux leverages
-&lt;a href=&quot;https://github.com/tmux/tmux&quot;&gt;tmux&lt;/a&gt;.) First, clone the wemux project to a
+<a href="https://github.com/tmux/tmux">tmux</a>.) First, clone the wemux project to a
 local directory. Typically, I keep 3rd-party repositories in a separate
-directory:&lt;/p&gt;
+directory:</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; ~/repos/3rd-party
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ~/repos/3rd-party
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git clone https://github.com/zolrath/wemux.git&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">mkdir</span> <span class="nt">-p</span> ~/repos/3rd-party
+<span class="nv">$ </span><span class="nb">cd</span> ~/repos/3rd-party
+<span class="nv">$ </span>git clone https://github.com/zolrath/wemux.git</code></pre></figure>
 
-&lt;p&gt;Now, configure wemux to only allow the host user to start a wemux session:&lt;/p&gt;
+<p>Now, configure wemux to only allow the host user to start a wemux session:</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;wemux
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;host_list=(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;USER&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; ./wemux.conf.example&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cd </span>wemux
+<span class="nv">$ </span><span class="nb">echo</span> <span class="s2">"host_list=(</span><span class="k">${</span><span class="nv">USER</span><span class="k">}</span><span class="s2">)"</span> <span class="o">&gt;&gt;</span> ./wemux.conf.example</code></pre></figure>
 
-&lt;p&gt;Symbolically link the &lt;code class=&quot;highlighter-rouge&quot;&gt;wemux&lt;/code&gt; executable to a directory that is on the system
-&lt;code class=&quot;highlighter-rouge&quot;&gt;$PATH&lt;/code&gt; and link the configuration file to the default location (you will need
-to run the following commands with &lt;code class=&quot;highlighter-rouge&quot;&gt;sudo&lt;/code&gt;):&lt;/p&gt;
+<p>Symbolically link the <code class="language-plaintext highlighter-rouge">wemux</code> executable to a directory that is on the system
+<code class="language-plaintext highlighter-rouge">$PATH</code> and link the configuration file to the default location (you will need
+to run the following commands with <code class="language-plaintext highlighter-rouge">sudo</code>):</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo ln&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/wemux /usr/local/bin/wemux &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-  &lt;span class=&quot;nb&quot;&gt;sudo ln&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/wemux.conf.example /usr/local/etc/wemux.conf&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo ln</span> <span class="nt">-s</span> <span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/wemux /usr/local/bin/wemux <span class="o">&amp;&amp;</span> <span class="se">\</span>
+  <span class="nb">sudo ln</span> <span class="nt">-s</span> <span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/wemux.conf.example /usr/local/etc/wemux.conf</code></pre></figure>
 
-&lt;h3 id=&quot;create-a-new-linux-user&quot;&gt;Create a new Linux User&lt;/h3&gt;
+<h3 id="create-a-new-linux-user">Create a new Linux User</h3>
 
-&lt;p&gt;We will create a new Linux user, called &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt;, that will only be used by
+<p>We will create a new Linux user, called <code class="language-plaintext highlighter-rouge">pair</code>, that will only be used by
 remote pair programming users. You can accept the default values when running
-the &lt;code class=&quot;highlighter-rouge&quot;&gt;adduser&lt;/code&gt; command, but make sure you specify a non-trivial password for the
-new user.&lt;/p&gt;
+the <code class="language-plaintext highlighter-rouge">adduser</code> command, but make sure you specify a non-trivial password for the
+new user.</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;adduser pair&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo </span>adduser pair</code></pre></figure>
 
-&lt;p&gt;Now that the user has been created, let’s modify the user’s &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.profile&lt;/code&gt; file
+<p>Now that the user has been created, let’s modify the user’s <code class="language-plaintext highlighter-rouge">~/.profile</code> file
 such that when the remote user logs in, they are immediately dropped into the
-currently running &lt;code class=&quot;highlighter-rouge&quot;&gt;wemux&lt;/code&gt; session.&lt;/p&gt;
+currently running <code class="language-plaintext highlighter-rouge">wemux</code> session.</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo&lt;/span&gt; /bin/bash &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;printf &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;wemux pair&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;exit&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; &amp;gt;&amp;gt; /home/pair/.profile&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo</span> /bin/bash <span class="nt">-c</span> <span class="s2">"printf </span><span class="se">\"</span><span class="s2">wemux pair</span><span class="se">\n</span><span class="s2">exit</span><span class="se">\n\"</span><span class="s2"> &gt;&gt; /home/pair/.profile"</span></code></pre></figure>
 
-&lt;p&gt;If the remote user tries to log into the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user and the host isn’t running
-&lt;code class=&quot;highlighter-rouge&quot;&gt;wemux&lt;/code&gt;, then the user’s SSH session is immediately terminated. Through this
+<p>If the remote user tries to log into the <code class="language-plaintext highlighter-rouge">pair</code> user and the host isn’t running
+<code class="language-plaintext highlighter-rouge">wemux</code>, then the user’s SSH session is immediately terminated. Through this
 mechanism, the host developer specifies when the remote user can access the
-&lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user. Also, the &lt;code class=&quot;highlighter-rouge&quot;&gt;exit&lt;/code&gt; command terminates the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user’s session
-when the &lt;code class=&quot;highlighter-rouge&quot;&gt;wemux&lt;/code&gt; session ends.&lt;/p&gt;
+<code class="language-plaintext highlighter-rouge">pair</code> user. Also, the <code class="language-plaintext highlighter-rouge">exit</code> command terminates the <code class="language-plaintext highlighter-rouge">pair</code> user’s session
+when the <code class="language-plaintext highlighter-rouge">wemux</code> session ends.</p>
 
-&lt;p&gt;To hold the public keys from remote developers, let’s create the
-&lt;code class=&quot;highlighter-rouge&quot;&gt;authorized_keys&lt;/code&gt; file for the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user:&lt;/p&gt;
+<p>To hold the public keys from remote developers, let’s create the
+<code class="language-plaintext highlighter-rouge">authorized_keys</code> file for the <code class="language-plaintext highlighter-rouge">pair</code> user:</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo&lt;/span&gt; /bin/bash &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;mkdir -p /home/pair/.ssh &amp;amp;&amp;amp; touch /home/pair/.ssh/authorized_keys&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo</span> /bin/bash <span class="nt">-c</span> <span class="s2">"mkdir -p /home/pair/.ssh &amp;&amp; touch /home/pair/.ssh/authorized_keys"</span></code></pre></figure>
 
-&lt;p&gt;For additional security, let’s configure the SSH server such that the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt;
-user can’t login with a password and then we’ll restart the SSH server:&lt;/p&gt;
+<p>For additional security, let’s configure the SSH server such that the <code class="language-plaintext highlighter-rouge">pair</code>
+user can’t login with a password and then we’ll restart the SSH server:</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo&lt;/span&gt; /bin/bash &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;printf &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Match User pair&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;    PasswordAuthentication no&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; &amp;gt;&amp;gt; /etc/ssh/sshd_config&quot;&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;service ssh restart&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo</span> /bin/bash <span class="nt">-c</span> <span class="s2">"printf </span><span class="se">\"</span><span class="s2">Match User pair</span><span class="se">\n</span><span class="s2">    PasswordAuthentication no</span><span class="se">\n\"</span><span class="s2"> &gt;&gt; /etc/ssh/sshd_config"</span>
+<span class="nv">$ </span><span class="nb">sudo </span>service ssh restart</code></pre></figure>
 
-&lt;h2 id=&quot;host-machine-session-initiation&quot;&gt;Host Machine Session Initiation&lt;/h2&gt;
+<h2 id="host-machine-session-initiation">Host Machine Session Initiation</h2>
 
-&lt;p&gt;The following are the typical steps required when initiating a new pair
-programming session.&lt;/p&gt;
+<p>The following are the typical steps required when initiating a new pair
+programming session.</p>
 
-&lt;h3 id=&quot;enable-ssh-login-via-publicprivate-key-authentication&quot;&gt;Enable SSH Login via Public/Private Key Authentication&lt;/h3&gt;
+<h3 id="enable-ssh-login-via-publicprivate-key-authentication">Enable SSH Login via Public/Private Key Authentication</h3>
 
-&lt;p&gt;The remote user will log into the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user, but we don’t want the remote
-user to have to know the password for the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user, so we will use
+<p>The remote user will log into the <code class="language-plaintext highlighter-rouge">pair</code> user, but we don’t want the remote
+user to have to know the password for the <code class="language-plaintext highlighter-rouge">pair</code> user, so we will use
 public/private key authentication for SSH login. The remote user needs to send
-their public key (typically located at &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.ssh/id_rsa.pub&lt;/code&gt;) to the host
+their public key (typically located at <code class="language-plaintext highlighter-rouge">~/.ssh/id_rsa.pub</code>) to the host
 developer. If the remote developer hasn’t generated SSH keys yet, the remote
 user should generate SSH keys with the following command (substituting a valid
-e-mail address):&lt;/p&gt;
+e-mail address):</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ssh-keygen &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; rsa &lt;span class=&quot;nt&quot;&gt;-b&lt;/span&gt; 4096 &lt;span class=&quot;nt&quot;&gt;-C&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;your_email@example.com&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ssh-keygen <span class="nt">-t</span> rsa <span class="nt">-b</span> 4096 <span class="nt">-C</span> <span class="s2">"your_email@example.com"</span></code></pre></figure>
 
-&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;id_rsa.pub&lt;/code&gt; file can be transferred to the host developer via e-mail,
-chat, etc. Upon reception of &lt;code class=&quot;highlighter-rouge&quot;&gt;id_rsa.pub&lt;/code&gt;, the host developer can add the
-public key to the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user’s &lt;code class=&quot;highlighter-rouge&quot;&gt;authorized_keys&lt;/code&gt; file to enable password-less
-SSH login:&lt;/p&gt;
+<p>The <code class="language-plaintext highlighter-rouge">id_rsa.pub</code> file can be transferred to the host developer via e-mail,
+chat, etc. Upon reception of <code class="language-plaintext highlighter-rouge">id_rsa.pub</code>, the host developer can add the
+public key to the <code class="language-plaintext highlighter-rouge">pair</code> user’s <code class="language-plaintext highlighter-rouge">authorized_keys</code> file to enable password-less
+SSH login:</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo&lt;/span&gt; /bin/bash &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;cat id_rsa.pub &amp;gt;&amp;gt; /home/pair/.ssh/authorized_keys&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo</span> /bin/bash <span class="nt">-c</span> <span class="s2">"cat id_rsa.pub &gt;&gt; /home/pair/.ssh/authorized_keys"</span></code></pre></figure>
 
-&lt;h3 id=&quot;expose-ssh-port-via-ngrok&quot;&gt;Expose SSH Port via ngrok&lt;/h3&gt;
+<h3 id="expose-ssh-port-via-ngrok">Expose SSH Port via ngrok</h3>
 
-&lt;p&gt;The host developer will now use the &lt;code class=&quot;highlighter-rouge&quot;&gt;ngrok&lt;/code&gt; command to expose port 22 of the
-SSH server:&lt;/p&gt;
+<p>The host developer will now use the <code class="language-plaintext highlighter-rouge">ngrok</code> command to expose port 22 of the
+SSH server:</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ngrok tcp 22&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ngrok tcp 22</code></pre></figure>
 
-&lt;p&gt;The ngrok connection information will be printed to the screen. Note the
+<p>The ngrok connection information will be printed to the screen. Note the
 information in the “Forwarding” section as this will be sent to the remote
 developer to access the host’s SSH server. For example, if the “Forwarding”
-section contained the following information:&lt;/p&gt;
+section contained the following information:</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;Forwarding                    tcp://0.tcp.ngrok.io:14242 -&amp;gt; localhost:22&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">Forwarding                    tcp://0.tcp.ngrok.io:14242 -&gt; localhost:22</code></pre></figure>
 
-&lt;p&gt;The remote user would use the following SSH command to log into the host’s
-machine (the &lt;code class=&quot;highlighter-rouge&quot;&gt;-p&lt;/code&gt; flag specifies the SSH port):&lt;/p&gt;
+<p>The remote user would use the following SSH command to log into the host’s
+machine (the <code class="language-plaintext highlighter-rouge">-p</code> flag specifies the SSH port):</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ssh &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 14242 pair@0.tcp.ngrok.io&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ssh <span class="nt">-p</span> 14242 pair@0.tcp.ngrok.io</code></pre></figure>
 
-&lt;h3 id=&quot;start-wemux-host-session&quot;&gt;Start wemux Host Session&lt;/h3&gt;
+<h3 id="start-wemux-host-session">Start wemux Host Session</h3>
 
-&lt;p&gt;The remote developer will not be able to log into the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user until the
-host developer starts the wemux session in a separate terminal:&lt;/p&gt;
+<p>The remote developer will not be able to log into the <code class="language-plaintext highlighter-rouge">pair</code> user until the
+host developer starts the wemux session in a separate terminal:</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;wemux&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>wemux</code></pre></figure>
 
-&lt;p&gt;At this point, the remote developer can run the previously shown SSH
+<p>At this point, the remote developer can run the previously shown SSH
 command. When, the host exits the wemux session, both users will be removed
-from the session and the remote user will be logged off.&lt;/p&gt;
+from the session and the remote user will be logged off.</p>
 
-&lt;h2 id=&quot;configuration-options&quot;&gt;Configuration Options&lt;/h2&gt;
+<h2 id="configuration-options">Configuration Options</h2>
 
-&lt;h3 id=&quot;wemux-options&quot;&gt;wemux options&lt;/h3&gt;
+<h3 id="wemux-options">wemux options</h3>
 
-&lt;p&gt;If you don’t want the remote user to be able to enter commands, you can force
-the remote user into the “mirror” mode by changing &lt;code class=&quot;highlighter-rouge&quot;&gt;wemux pair&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;wemux
-mirror&lt;/code&gt; in the &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.profile&lt;/code&gt; file.&lt;/p&gt;
+<p>If you don’t want the remote user to be able to enter commands, you can force
+the remote user into the “mirror” mode by changing <code class="language-plaintext highlighter-rouge">wemux pair</code> to <code class="language-plaintext highlighter-rouge">wemux
+mirror</code> in the <code class="language-plaintext highlighter-rouge">~/.profile</code> file.</p>
 
-&lt;h2 id=&quot;other-notes&quot;&gt;Other Notes&lt;/h2&gt;
+<h2 id="other-notes">Other Notes</h2>
 
-&lt;p&gt;After you modify the &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user’s &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.profile&lt;/code&gt; file, you won’t be able to
-easily log into &lt;code class=&quot;highlighter-rouge&quot;&gt;pair&lt;/code&gt; user with the normal &lt;code class=&quot;highlighter-rouge&quot;&gt;su pair&lt;/code&gt; command without having to
+<p>After you modify the <code class="language-plaintext highlighter-rouge">pair</code> user’s <code class="language-plaintext highlighter-rouge">~/.profile</code> file, you won’t be able to
+easily log into <code class="language-plaintext highlighter-rouge">pair</code> user with the normal <code class="language-plaintext highlighter-rouge">su pair</code> command without having to
 start the wemux server. Instead, you can just directly modify the user’s
-configuration files by prefixing your editor call with &lt;code class=&quot;highlighter-rouge&quot;&gt;sudo&lt;/code&gt;:&lt;/p&gt;
+configuration files by prefixing your editor call with <code class="language-plaintext highlighter-rouge">sudo</code>:</p>
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;nano /home/pair/.profile&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo </span>nano /home/pair/.profile</code></pre></figure>
 
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+<h2 id="references">References</h2>
 
-&lt;p&gt;The following blog posts were used to put together this post:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://brianschiller.com/blog/2014/07/18/pair-programming-wemux&quot;&gt;Pair Programming with wemux and ngrok&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;http://martinbrochhaus.com/pair.html&quot;&gt;Pair Programming With Tmux&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.hamvocke.com/blog/remote-pair-programming-with-tmux/&quot;&gt;Remote Pair Programming Made Easy with SSH and tmux&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://ryanlue.com/posts/2018-01-13-pair-programming-over-ssh&quot;&gt;ssh + tmux = Pair Programming for Command Line Junkies&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Kevin DeMarco</name></author><category term="ssh" /><category term="programming" /><category term="ngrok" /><category term="tmux" /><category term="wemux" /><category term="terminal" /><summary type="html">There are several benefits to the use of pair programming in the software development process: fewer mistakes, better understanding of the codebase across multiple developers, and improved team cohesiveness (cf. The Pros and Cons of Pair Programming). Personally, I have found pair programming can be especially useful for training. Experienced developers forget the multitude of tiny stumbling blocks that less experienced developers encounter on a daily basis. Also, it can be helpful for less experienced developers to see how experienced developers have customized their tools for increased productivity (e.g., terminal setup, emacs config, vim config, etc.)</summary></entry></feed>
+<p>The following blog posts were used to put together this post:</p>
+<ul>
+  <li><a href="https://brianschiller.com/blog/2014/07/18/pair-programming-wemux">Pair Programming with wemux and ngrok</a></li>
+  <li><a href="http://martinbrochhaus.com/pair.html">Pair Programming With Tmux</a></li>
+  <li><a href="https://www.hamvocke.com/blog/remote-pair-programming-with-tmux/">Remote Pair Programming Made Easy with SSH and tmux</a></li>
+  <li><a href="https://ryanlue.com/posts/2018-01-13-pair-programming-over-ssh">ssh + tmux = Pair Programming for Command Line Junkies</a></li>
+</ul>]]></content><author><name>Kevin DeMarco</name></author><category term="ssh" /><category term="programming" /><category term="ngrok" /><category term="tmux" /><category term="wemux" /><category term="terminal" /><summary type="html"><![CDATA[There are several benefits to the use of pair programming in the software development process: fewer mistakes, better understanding of the codebase across multiple developers, and improved team cohesiveness (cf. The Pros and Cons of Pair Programming). Personally, I have found pair programming can be especially useful for training. Experienced developers forget the multitude of tiny stumbling blocks that less experienced developers encounter on a daily basis. Also, it can be helpful for less experienced developers to see how experienced developers have customized their tools for increased productivity (e.g., terminal setup, emacs config, vim config, etc.)]]></summary></entry></feed>

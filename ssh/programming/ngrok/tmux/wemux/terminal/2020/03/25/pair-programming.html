@@ -1,6 +1,6 @@
 <!doctype html>
 <!--
-  Minimal Mistakes Jekyll Theme 4.21.0 by Michael Rose
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
   Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
   Free for personal and commercial use under the MIT license
   https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
@@ -77,10 +77,13 @@
 
 
 
+
 <!-- end _includes/seo.html -->
 
 
-<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Kevin DeMarco Feed">
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Kevin DeMarco Feed">
+
 
 <!-- https://t.co/dKP3o1e -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -91,22 +94,8 @@
 
 <!-- For all browsers -->
 <link rel="stylesheet" href="/assets/css/main.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
-
-<!--[if IE]>
-  <style>
-    /* old IE unsupported flexbox fixes */
-    .greedy-nav .site-title {
-      padding-right: 3em;
-    }
-    .greedy-nav button {
-      position: absolute;
-      top: 0;
-      right: 0;
-      height: 100%;
-    }
-  </style>
-<![endif]-->
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
 
 
 
@@ -120,7 +109,6 @@
 
   <body class="layout--single">
     <nav class="skip-links">
-  <h2 class="screen-reader-text">Skip links</h2>
   <ul>
     <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
     <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
@@ -155,9 +143,7 @@
         
         <button class="search__toggle" type="button">
           <span class="visually-hidden">Toggle search</span>
-          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
-            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
-          </svg>
+          <i class="fas fa-search"></i>
         </button>
         
         <button class="greedy-nav__toggle hidden" type="button">
@@ -187,7 +173,7 @@
   
     <div class="author__avatar">
       
-        <img src="/assets/biking-face.jpg" alt="Kevin DeMarco" itemprop="image">
+        <img src="/assets/KevinBW2.png" alt="Kevin DeMarco" itemprop="image">
       
     </div>
   
@@ -224,11 +210,11 @@
           
         
           
-            <li><a href="https://instagram.com/syllogismrxs" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-instagram" aria-hidden="true"></i><span class="label">Instagram</span></a></li>
+            <li><a href="https://instagram.com/gotosemicolon" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-instagram" aria-hidden="true"></i><span class="label">Instagram</span></a></li>
           
         
           
-            <li><a href="https://twitter.com/syllogismrxs" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+            <li><a href="https://twitter.com/kevinjdemarco" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
           
         
       
@@ -363,13 +349,13 @@ developers that you don’t trust.</p>
 <p><img src="https://kevindemarco.com/assets/images/2020-03-25-pair-programming/pair-ssh-diagram.jpg" alt="Pair SSH Diagram" /></p>
 
 <p>As shown in the diagram, the pair programming server is initiated by the host
-developer running the <code class="highlighter-rouge">wemux</code> command. The remote developer then uses SSH to
-log into the <code class="highlighter-rouge">pair</code> Linux user on the host machine. The pair user’s
-<code class="highlighter-rouge">~/.profile</code> file is configured to run the command, <code class="highlighter-rouge">wemux pair; exit</code>, which
+developer running the <code class="language-plaintext highlighter-rouge">wemux</code> command. The remote developer then uses SSH to
+log into the <code class="language-plaintext highlighter-rouge">pair</code> Linux user on the host machine. The pair user’s
+<code class="language-plaintext highlighter-rouge">~/.profile</code> file is configured to run the command, <code class="language-plaintext highlighter-rouge">wemux pair; exit</code>, which
 forces the remote user to immediately join the wemux session upon login and
 exit the SSH session when the wemux session ends. Finally, to make it easier to
 SSH into computers that are behind firewalls, proxies, and VPN servers, the
-host machine will use <code class="highlighter-rouge">ngrok</code> to provide an SSH tunnel (cf. <a href="https://ngrok.com/">ngrok</a>).</p>
+host machine will use <code class="language-plaintext highlighter-rouge">ngrok</code> to provide an SSH tunnel (cf. <a href="https://ngrok.com/">ngrok</a>).</p>
 
 <h2 id="one-time-host-linux-machine-configuration">One-Time Host Linux Machine Configuration</h2>
 
@@ -396,7 +382,7 @@ can be securely accessed behind firewalls and VPN servers.</p>
 authorization token in your ngrok account to authorize your machine. Copy the
 authorization token from the website,
 <a href="https://dashboard.ngrok.com/auth">https://dashboard.ngrok.com/auth</a>, and run
-the following command, where <code class="highlighter-rouge">&lt;authorization-token&gt;</code> is the copied token:</p>
+the following command, where <code class="language-plaintext highlighter-rouge">&lt;authorization-token&gt;</code> is the copied token:</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ngrok authtoken &lt;authorization-token&gt;</code></pre></figure>
 
@@ -417,40 +403,40 @@ directory:</p>
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cd </span>wemux
 <span class="nv">$ </span><span class="nb">echo</span> <span class="s2">"host_list=(</span><span class="k">${</span><span class="nv">USER</span><span class="k">}</span><span class="s2">)"</span> <span class="o">&gt;&gt;</span> ./wemux.conf.example</code></pre></figure>
 
-<p>Symbolically link the <code class="highlighter-rouge">wemux</code> executable to a directory that is on the system
-<code class="highlighter-rouge">$PATH</code> and link the configuration file to the default location (you will need
-to run the following commands with <code class="highlighter-rouge">sudo</code>):</p>
+<p>Symbolically link the <code class="language-plaintext highlighter-rouge">wemux</code> executable to a directory that is on the system
+<code class="language-plaintext highlighter-rouge">$PATH</code> and link the configuration file to the default location (you will need
+to run the following commands with <code class="language-plaintext highlighter-rouge">sudo</code>):</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo ln</span> <span class="nt">-s</span> <span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/wemux /usr/local/bin/wemux <span class="o">&amp;&amp;</span> <span class="se">\</span>
   <span class="nb">sudo ln</span> <span class="nt">-s</span> <span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/wemux.conf.example /usr/local/etc/wemux.conf</code></pre></figure>
 
 <h3 id="create-a-new-linux-user">Create a new Linux User</h3>
 
-<p>We will create a new Linux user, called <code class="highlighter-rouge">pair</code>, that will only be used by
+<p>We will create a new Linux user, called <code class="language-plaintext highlighter-rouge">pair</code>, that will only be used by
 remote pair programming users. You can accept the default values when running
-the <code class="highlighter-rouge">adduser</code> command, but make sure you specify a non-trivial password for the
+the <code class="language-plaintext highlighter-rouge">adduser</code> command, but make sure you specify a non-trivial password for the
 new user.</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo </span>adduser pair</code></pre></figure>
 
-<p>Now that the user has been created, let’s modify the user’s <code class="highlighter-rouge">~/.profile</code> file
+<p>Now that the user has been created, let’s modify the user’s <code class="language-plaintext highlighter-rouge">~/.profile</code> file
 such that when the remote user logs in, they are immediately dropped into the
-currently running <code class="highlighter-rouge">wemux</code> session.</p>
+currently running <code class="language-plaintext highlighter-rouge">wemux</code> session.</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo</span> /bin/bash <span class="nt">-c</span> <span class="s2">"printf </span><span class="se">\"</span><span class="s2">wemux pair</span><span class="se">\n</span><span class="s2">exit</span><span class="se">\n\"</span><span class="s2"> &gt;&gt; /home/pair/.profile"</span></code></pre></figure>
 
-<p>If the remote user tries to log into the <code class="highlighter-rouge">pair</code> user and the host isn’t running
-<code class="highlighter-rouge">wemux</code>, then the user’s SSH session is immediately terminated. Through this
+<p>If the remote user tries to log into the <code class="language-plaintext highlighter-rouge">pair</code> user and the host isn’t running
+<code class="language-plaintext highlighter-rouge">wemux</code>, then the user’s SSH session is immediately terminated. Through this
 mechanism, the host developer specifies when the remote user can access the
-<code class="highlighter-rouge">pair</code> user. Also, the <code class="highlighter-rouge">exit</code> command terminates the <code class="highlighter-rouge">pair</code> user’s session
-when the <code class="highlighter-rouge">wemux</code> session ends.</p>
+<code class="language-plaintext highlighter-rouge">pair</code> user. Also, the <code class="language-plaintext highlighter-rouge">exit</code> command terminates the <code class="language-plaintext highlighter-rouge">pair</code> user’s session
+when the <code class="language-plaintext highlighter-rouge">wemux</code> session ends.</p>
 
 <p>To hold the public keys from remote developers, let’s create the
-<code class="highlighter-rouge">authorized_keys</code> file for the <code class="highlighter-rouge">pair</code> user:</p>
+<code class="language-plaintext highlighter-rouge">authorized_keys</code> file for the <code class="language-plaintext highlighter-rouge">pair</code> user:</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo</span> /bin/bash <span class="nt">-c</span> <span class="s2">"mkdir -p /home/pair/.ssh &amp;&amp; touch /home/pair/.ssh/authorized_keys"</span></code></pre></figure>
 
-<p>For additional security, let’s configure the SSH server such that the <code class="highlighter-rouge">pair</code>
+<p>For additional security, let’s configure the SSH server such that the <code class="language-plaintext highlighter-rouge">pair</code>
 user can’t login with a password and then we’ll restart the SSH server:</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo</span> /bin/bash <span class="nt">-c</span> <span class="s2">"printf </span><span class="se">\"</span><span class="s2">Match User pair</span><span class="se">\n</span><span class="s2">    PasswordAuthentication no</span><span class="se">\n\"</span><span class="s2"> &gt;&gt; /etc/ssh/sshd_config"</span>
@@ -463,26 +449,26 @@ programming session.</p>
 
 <h3 id="enable-ssh-login-via-publicprivate-key-authentication">Enable SSH Login via Public/Private Key Authentication</h3>
 
-<p>The remote user will log into the <code class="highlighter-rouge">pair</code> user, but we don’t want the remote
-user to have to know the password for the <code class="highlighter-rouge">pair</code> user, so we will use
+<p>The remote user will log into the <code class="language-plaintext highlighter-rouge">pair</code> user, but we don’t want the remote
+user to have to know the password for the <code class="language-plaintext highlighter-rouge">pair</code> user, so we will use
 public/private key authentication for SSH login. The remote user needs to send
-their public key (typically located at <code class="highlighter-rouge">~/.ssh/id_rsa.pub</code>) to the host
+their public key (typically located at <code class="language-plaintext highlighter-rouge">~/.ssh/id_rsa.pub</code>) to the host
 developer. If the remote developer hasn’t generated SSH keys yet, the remote
 user should generate SSH keys with the following command (substituting a valid
 e-mail address):</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ssh-keygen <span class="nt">-t</span> rsa <span class="nt">-b</span> 4096 <span class="nt">-C</span> <span class="s2">"your_email@example.com"</span></code></pre></figure>
 
-<p>The <code class="highlighter-rouge">id_rsa.pub</code> file can be transferred to the host developer via e-mail,
-chat, etc. Upon reception of <code class="highlighter-rouge">id_rsa.pub</code>, the host developer can add the
-public key to the <code class="highlighter-rouge">pair</code> user’s <code class="highlighter-rouge">authorized_keys</code> file to enable password-less
+<p>The <code class="language-plaintext highlighter-rouge">id_rsa.pub</code> file can be transferred to the host developer via e-mail,
+chat, etc. Upon reception of <code class="language-plaintext highlighter-rouge">id_rsa.pub</code>, the host developer can add the
+public key to the <code class="language-plaintext highlighter-rouge">pair</code> user’s <code class="language-plaintext highlighter-rouge">authorized_keys</code> file to enable password-less
 SSH login:</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo</span> /bin/bash <span class="nt">-c</span> <span class="s2">"cat id_rsa.pub &gt;&gt; /home/pair/.ssh/authorized_keys"</span></code></pre></figure>
 
 <h3 id="expose-ssh-port-via-ngrok">Expose SSH Port via ngrok</h3>
 
-<p>The host developer will now use the <code class="highlighter-rouge">ngrok</code> command to expose port 22 of the
+<p>The host developer will now use the <code class="language-plaintext highlighter-rouge">ngrok</code> command to expose port 22 of the
 SSH server:</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ngrok tcp 22</code></pre></figure>
@@ -495,13 +481,13 @@ section contained the following information:</p>
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash">Forwarding                    tcp://0.tcp.ngrok.io:14242 -&gt; localhost:22</code></pre></figure>
 
 <p>The remote user would use the following SSH command to log into the host’s
-machine (the <code class="highlighter-rouge">-p</code> flag specifies the SSH port):</p>
+machine (the <code class="language-plaintext highlighter-rouge">-p</code> flag specifies the SSH port):</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ssh <span class="nt">-p</span> 14242 pair@0.tcp.ngrok.io</code></pre></figure>
 
 <h3 id="start-wemux-host-session">Start wemux Host Session</h3>
 
-<p>The remote developer will not be able to log into the <code class="highlighter-rouge">pair</code> user until the
+<p>The remote developer will not be able to log into the <code class="language-plaintext highlighter-rouge">pair</code> user until the
 host developer starts the wemux session in a separate terminal:</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>wemux</code></pre></figure>
@@ -515,15 +501,15 @@ from the session and the remote user will be logged off.</p>
 <h3 id="wemux-options">wemux options</h3>
 
 <p>If you don’t want the remote user to be able to enter commands, you can force
-the remote user into the “mirror” mode by changing <code class="highlighter-rouge">wemux pair</code> to <code class="highlighter-rouge">wemux
-mirror</code> in the <code class="highlighter-rouge">~/.profile</code> file.</p>
+the remote user into the “mirror” mode by changing <code class="language-plaintext highlighter-rouge">wemux pair</code> to <code class="language-plaintext highlighter-rouge">wemux
+mirror</code> in the <code class="language-plaintext highlighter-rouge">~/.profile</code> file.</p>
 
 <h2 id="other-notes">Other Notes</h2>
 
-<p>After you modify the <code class="highlighter-rouge">pair</code> user’s <code class="highlighter-rouge">~/.profile</code> file, you won’t be able to
-easily log into <code class="highlighter-rouge">pair</code> user with the normal <code class="highlighter-rouge">su pair</code> command without having to
+<p>After you modify the <code class="language-plaintext highlighter-rouge">pair</code> user’s <code class="language-plaintext highlighter-rouge">~/.profile</code> file, you won’t be able to
+easily log into <code class="language-plaintext highlighter-rouge">pair</code> user with the normal <code class="language-plaintext highlighter-rouge">su pair</code> command without having to
 start the wemux server. Instead, you can just directly modify the user’s
-configuration files by prefixing your editor call with <code class="highlighter-rouge">sudo</code>:</p>
+configuration files by prefixing your editor call with <code class="language-plaintext highlighter-rouge">sudo</code>:</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">sudo </span>nano /home/pair/.profile</code></pre></figure>
 
@@ -547,12 +533,15 @@ configuration files by prefixing your editor call with <code class="highlighter-
 
 
         
+
   <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2020-03-25T23:11:13-04:00">March 25, 2020</time></p>
 
 
       </footer>
 
       <section class="page__share">
+  
+    <h4 class="page__share-title">Share on</h4>
   
 
   <a href="https://twitter.com/intent/tweet?via=syllogismrxs&text=Remote+Pair+Programming+via+SSH+and+wemux+on+Linux%20https%3A%2F%2Fkevindemarco.com%2Fssh%2Fprogramming%2Fngrok%2Ftmux%2Fwemux%2Fterminal%2F2020%2F03%2F25%2Fpair-programming.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
@@ -580,7 +569,7 @@ configuration files by prefixing your editor call with <code class="highlighter-
       <div class="page__comments">
   
   
-      <h4 class="page__comments-title">Comments</h4>
+      <h4 class="page__comments-title">Leave a comment</h4>
       <section id="disqus_thread"></section>
     
 </div>
@@ -591,8 +580,53 @@ configuration files by prefixing your editor call with <code class="highlighter-
   
   
     <div class="page__related">
-      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <h4 class="page__related-title">You may also enjoy</h4>
       <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker.html" rel="permalink">ROS Development in Docker
+</a>
+      
+      
+        <div class="archive__item-teaser">
+          <a href="/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker.html" rel="permalink"><img src="/assets/images/2022-12-28-ros-docker/docker-ros.png" alt=""></a>
+        </div>
+    
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          6 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">If you use the Robot Operating System (ROS) and you are
+frusterated with system dependencies, incompatible ROS / Linux operating system
+versions, and non-det...</p>
+  </article>
+</div>
+
         
           
 
@@ -678,7 +712,6 @@ quest...</p>
 
 
     <p class="archive__item-excerpt" itemprop="description">What do you get when you cross a Roomba…
-
 </p>
   </article>
 </div>
@@ -723,7 +756,6 @@ quest...</p>
 
 
     <p class="archive__item-excerpt" itemprop="description">
-
 </p>
   </article>
 </div>
@@ -758,6 +790,8 @@ quest...</p>
         <div class="page__footer-follow">
   <ul class="social-icons">
     
+      <li><strong>Follow:</strong></li>
+    
 
     
       
@@ -765,11 +799,13 @@ quest...</p>
       
     
 
-    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
   </ul>
 </div>
 
-<div class="page__footer-copyright">&copy; 2021 Kevin DeMarco. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+<div class="page__footer-copyright">&copy; 2022 Kevin DeMarco. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
 
       </footer>
     </div>
