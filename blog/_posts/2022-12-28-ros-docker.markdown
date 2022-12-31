@@ -239,3 +239,8 @@ an NVIDIA GPU and you will need to install `nvidia-docker2` using NVIDIA's
    workspace's `local_setup.bash` is added to the `ros` user's `.bashrc` file,
    so that it's resources are immediately available when the container is
    entered.
+
+## Looking Forward
+
+In a future post I will describe how I use [`direnv`](https://direnv.net/) to
+quickly open multiple ROS Docker containers.
