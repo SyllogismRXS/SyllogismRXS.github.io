@@ -1,16 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.1">Jekyll</generator><link href="https://kevindemarco.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kevindemarco.com/" rel="alternate" type="text/html" /><updated>2022-12-31T16:14:29-05:00</updated><id>https://kevindemarco.com/feed.xml</id><title type="html">Kevin DeMarco</title><subtitle>I write about robotics, technology, music, woodworking, and bicycling.</subtitle><author><name>Kevin DeMarco</name></author><entry><title type="html">ROS Development in Docker</title><link href="https://kevindemarco.com/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker.html" rel="alternate" type="text/html" title="ROS Development in Docker" /><published>2022-12-28T09:45:00-05:00</published><updated>2022-12-28T09:45:00-05:00</updated><id>https://kevindemarco.com/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker</id><content type="html" xml:base="https://kevindemarco.com/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker.html"><![CDATA[<p>If you use the <a href="https://www.ros.org">Robot Operating System (ROS)</a> and you are
-frusterated with system dependencies, incompatible ROS / Linux operating system
-versions, and non-determinstic builds, then this article is for you.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.1">Jekyll</generator><link href="https://kevindemarco.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kevindemarco.com/" rel="alternate" type="text/html" /><updated>2023-01-02T14:31:33-05:00</updated><id>https://kevindemarco.com/feed.xml</id><title type="html">Kevin DeMarco</title><subtitle>I write about robotics, technology, music, woodworking, and bicycling.</subtitle><author><name>Kevin DeMarco</name></author><entry><title type="html">ROS Development in Docker</title><link href="https://kevindemarco.com/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker.html" rel="alternate" type="text/html" title="ROS Development in Docker" /><published>2022-12-28T09:45:00-05:00</published><updated>2022-12-28T09:45:00-05:00</updated><id>https://kevindemarco.com/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker</id><content type="html" xml:base="https://kevindemarco.com/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker.html"><![CDATA[<p>If you use the <a href="https://www.ros.org">Robot Operating System (ROS)</a> and you are
+frustrated with system dependencies, incompatible ROS / Linux operating system
+versions, and non-deterministic builds, then this article is for you.</p>
 
-<p>For each of my ROS development workspaces, I create a
-<a href="https://www.docker.com/">Docker</a> development environment to isolate the ROS
-environment from my host system’s environment. This allows me to easily run an
-old version of ROS (e.g., ROS Kinetic), on a new version of Ubuntu (e.g.,
-Ubuntu 22.04 Jammy). Docker is similar to a very light-weight virtual machine,
-but Docker allows you to more easily share hardware resources between the host
-machine and the Docker container.</p>
+<p>For each of my ROS projects, I create a <a href="https://www.docker.com/">Docker</a>
+development environment to isolate the ROS environment from my host system’s
+environment. This allows me to easily run an old version of ROS (e.g., ROS
+Kinetic), on a newer version of Ubuntu (e.g., Ubuntu 22.04 Jammy). The inverse
+is also true: you can run a newer ROS version on an older Linux
+distribution. Docker is conceptually similar to a very light-weight virtual
+machine, but Docker allows you to more easily share hardware resources between
+the host machine and the Docker container.</p>
 
-<p>There are a number of other guides to setup a  development
+<p>Throughout this guide, I will be referencing an example git repository
+(<a href="https://github.com/SyllogismRXS/ros_docker_setup">https://github.com/SyllogismRXS/ros_docker_setup</a>)
+that I created to demonstrate how to set up a ROS Docker development
+environment.</p>
+
+<p>There are a number of other guides to setup a ROS Docker development
 environment:</p>
 <ul>
   <li><a href="https://roboticseabass.com/2021/04/21/docker-and-ros/">ROS Docker 1</a></li>
@@ -22,8 +28,8 @@ Mac/Windows</a></li>
 </ul>
 
 <p>I think that many of the articles focus on basic Docker commands, instead of an
-opinionated description of how to organize your ROS workspaces and
-repositories to facilitate collaborative development.</p>
+opinionated description of how to organize your ROS workspaces and repositories
+to facilitate collaborative development and continuous integration (CI).</p>
 
 <h2 id="design-requirements">Design Requirements</h2>
 
@@ -33,6 +39,8 @@ repositories to facilitate collaborative development.</p>
   <li>Use our preferred code/text editor on the host system.</li>
   <li>Launch ROS GUI programs from within the container.</li>
   <li>Leverage the host system’s GPU, if available.</li>
+  <li>Make it easy for new developers to start building / writing ROS code.</li>
+  <li>Minimize long <code class="language-plaintext highlighter-rouge">docker</code> command line arguments / options.</li>
 </ol>
 
 <h2 id="host-system-dependencies">Host System Dependencies</h2>
@@ -72,6 +80,10 @@ use a different root directory.</p>
 
     <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> mkdir -p ~/ros/ros_docker_example/workspace/src
 </code></pre></div>    </div>
+
+    <p>In this case, the <code class="language-plaintext highlighter-rouge">ros_docker_example</code> is the name of my current ROS
+ project. I keep multiple ROS projects in the <code class="language-plaintext highlighter-rouge">~/ros</code> folder. Each ROS
+ project gets its own set of Docker / Compose files.</p>
   </li>
   <li>
     <p>Create a <code class="language-plaintext highlighter-rouge">data</code> directory, which will be used to facilitate exchanging
@@ -88,14 +100,16 @@ files (e.g., ROS bags), between the ROS Docker container and your host system:</
  git clone https://github.com/SyllogismRXS/ros_docker_setup.git
 </code></pre></div>    </div>
 
-    <p>Your directory should now look like the following:</p>
+    <p>The <code class="language-plaintext highlighter-rouge">~/ros/ros_docker_example</code> directory should now contain the
+ following:</p>
 
     <p><img src="https://kevindemarco.com/assets/images/2022-12-28-ros-docker/tree.png" alt="Directory Structure" /></p>
   </li>
   <li>
-    <p>Clone the ROS2 example repository into your workspace’s <code class="language-plaintext highlighter-rouge">src</code> folder. We
-will be building these example projects to test our build system. You would
-replace this repository with your own ROS repositories.</p>
+    <p>Since this ROS Docker example targets the ROS2 Humble distribution, clone
+the ROS2 example repository into your workspace’s <code class="language-plaintext highlighter-rouge">src</code> folder. We will be
+building these example projects to test our build system. You would replace
+this repository with your own ROS repositories.</p>
 
     <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> cd ~/ros/ros_docker_example/workspace/src
  git clone -b humble https://github.com/ros2/examples.git
@@ -110,8 +124,9 @@ so that we can launch ROS GUIs from within the Docker container.</p>
  echo -e "USER_ID=$(id -u ${USER})\nGROUP_ID=$(id -g ${USER})" &gt; .env
 </code></pre></div>    </div>
 
-    <p>Docker compose will automatically read the <code class="language-plaintext highlighter-rouge">.env</code> file before running any
- commands.</p>
+    <p>Docker compose will <a href="https://docs.docker.com/compose/environment-variables/">automatically
+ read</a> the <code class="language-plaintext highlighter-rouge">.env</code>
+ file before running <code class="language-plaintext highlighter-rouge">up</code> commands.</p>
   </li>
   <li>
     <p>We can now build the Docker image in the <code class="language-plaintext highlighter-rouge">ros_docker_setup</code> directory:</p>
@@ -125,7 +140,8 @@ so that we can launch ROS GUIs from within the Docker container.</p>
 
 <ol>
   <li>
-    <p>Run the minimal subscriber example</p>
+    <p>Bring up the Docker container, step into it, and run the minimal subscriber
+example</p>
 
     <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> docker compose up -d dev
  docker exec -it ros_humble /bin/bash
@@ -133,7 +149,8 @@ so that we can launch ROS GUIs from within the Docker container.</p>
 </code></pre></div>    </div>
   </li>
   <li>
-    <p>In a different terminal, run the minimal publisher example:</p>
+    <p>In a different terminal, step into the already running container, and run
+the minimal publisher example:</p>
 
     <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> docker exec -it ros_humble /bin/bash
  ros2 run examples_rclcpp_minimal_publisher publisher_member_function
@@ -207,20 +224,39 @@ build command via the build arguments:</p>
 access to the host’s networking system. This is fine for a development
 environment, but should be made more restrictive in a deployed container
 (not our current use-case).</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> network_mode: "host"
+</code></pre></div>    </div>
   </li>
   <li>
     <p>The <code class="language-plaintext highlighter-rouge">DISPLAY</code> environment variable display is passed from the host to the
 container to enable GUI applications. In addition, the <code class="language-plaintext highlighter-rouge">.X11-unix</code> and
 <code class="language-plaintext highlighter-rouge">.docker.xauth</code> files are mounted from the host to the container in the
 <code class="language-plaintext highlighter-rouge">volumes</code> section to enable GUIs.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> environment:
+   - DISPLAY=${DISPLAY}             # Pass the display for GUI
+   - QT_X11_NO_MITSHM=1             # Needed by QT programs
+   - XAUTHORITY=/tmp/.docker.xauth
+</code></pre></div>    </div>
   </li>
   <li>
-    <p>The <code class="language-plaintext highlighter-rouge">src</code> directory of the workspace is mounted from the host to the
-container in the <code class="language-plaintext highlighter-rouge">volumes</code> section. It is important to note that the
+    <p>The <code class="language-plaintext highlighter-rouge">src</code> and <code class="language-plaintext highlighter-rouge">data</code> directories of the workspace are mounted from the host
+to the container in the <code class="language-plaintext highlighter-rouge">volumes</code> section. It is important to note that the
 <code class="language-plaintext highlighter-rouge">volumes</code> section of the <code class="language-plaintext highlighter-rouge">docker-compose.yml</code> file is only relevant during
 <code class="language-plaintext highlighter-rouge">up</code> and <code class="language-plaintext highlighter-rouge">run</code> commands, not during the <code class="language-plaintext highlighter-rouge">build</code> phase. During build time,
 the code is copied into the Docker image with the <code class="language-plaintext highlighter-rouge">COPY</code> command in the
 <code class="language-plaintext highlighter-rouge">Dockerfile</code>.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> volumes:
+    - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
+    - ../workspace/src:/home/ros/workspace/src
+    - ../data:/home/ros/data
+</code></pre></div>    </div>
+
+    <p>The <code class="language-plaintext highlighter-rouge">.X11-unix</code> and <code class="language-plaintext highlighter-rouge">.docker.xauth</code> files are mounted to help with
+ launching GUIs from the container.</p>
   </li>
 </ol>
 
@@ -235,6 +271,12 @@ based on the <code class="language-plaintext highlighter-rouge">osrf/ros:humble-
 main ROS folks (OSRF, OpenRobotics, etc.) This image already contains an
 installed version of ROS Humble and many of the GUIs and build utilities,
 which we will be using.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> FROM osrf/ros:humble-desktop-full
+ MAINTAINER Kevin DeMarco
+ ENV DEBIAN_FRONTEND noninteractive
+ SHELL ["/bin/bash", "-c"]
+</code></pre></div>    </div>
   </li>
   <li>
     <p>After declaring the <code class="language-plaintext highlighter-rouge">FROM</code> image and some basic metadata, we install a
@@ -247,7 +289,10 @@ specific Debian package:</p>
 </code></pre></div>    </div>
 
     <p>In your own Dockerfile, you would augment this Debian package installation
- list to fit your needs.</p>
+ list to fit your needs. You should list ROS package dependencies
+ <a href="http://wiki.ros.org/catkin/package.xml#Dependencies">explicitly</a> in their
+ respective <code class="language-plaintext highlighter-rouge">package.xml</code> files, but sometimes there are missing
+ dependencies in upstream packages.</p>
   </li>
   <li>
     <p>Using the <code class="language-plaintext highlighter-rouge">adduser</code> command, we create a <code class="language-plaintext highlighter-rouge">ros</code> user with the same <code class="language-plaintext highlighter-rouge">USER_ID</code>
@@ -255,35 +300,82 @@ and <code class="language-plaintext highlighter-rouge">GROUP_ID</code> as your h
 addition, the <code class="language-plaintext highlighter-rouge">ros</code> user can issue <code class="language-plaintext highlighter-rouge">sudo</code> commands without a
 password. Again, this is fine for a local development environment, but you
 wouldn’t do this in a deployed Docker image.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> ENV USERNAME ros
+ RUN adduser --disabled-password --gecos '' $USERNAME \
+     &amp;&amp; usermod  --uid ${USER_ID} $USERNAME \
+     &amp;&amp; groupmod --gid ${GROUP_ID} $USERNAME \
+     &amp;&amp; usermod --shell /bin/bash $USERNAME \
+     &amp;&amp; adduser $USERNAME sudo \
+     &amp;&amp; adduser $USERNAME dialout \
+     &amp;&amp; echo '%sudo ALL=(ALL) NOPASSWD:ALL' &gt;&gt; /etc/sudoers
+</code></pre></div>    </div>
   </li>
   <li>
-    <p>We source the main ROS system’s setup file (<code class="language-plaintext highlighter-rouge">/opt/ros/humble/setup.bash</code>)
-and colcon’s setup file to the <code class="language-plaintext highlighter-rouge">ros</code> user’s <code class="language-plaintext highlighter-rouge">.bashrc</code>. This provides the
-<code class="language-plaintext highlighter-rouge">ros</code> user with access to the ROS environment every time the container is
-entered.</p>
+    <p>Run <code class="language-plaintext highlighter-rouge">rosdep</code> update. Also, add the sourcing of the main ROS system’s setup
+file (<code class="language-plaintext highlighter-rouge">/opt/ros/humble/setup.bash</code>) and colcon’s setup file to the <code class="language-plaintext highlighter-rouge">ros</code>
+user’s <code class="language-plaintext highlighter-rouge">.bashrc</code>. This provides the <code class="language-plaintext highlighter-rouge">ros</code> user with access to the ROS
+environment every time the container is entered.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> # Run rosdep update, add ROS, Gazebo, and colcon setup to ros user's .bashrc
+ RUN sudo apt-get update \
+     &amp;&amp; rosdep update \
+     &amp;&amp; echo 'source /opt/ros/${ROS_DISTRO}/setup.bash' &gt;&gt; /home/$USERNAME/.bashrc \
+     &amp;&amp; echo 'source /usr/share/colcon_cd/function/colcon_cd.sh' &gt;&gt; /home/$USERNAME/.bashrc
+</code></pre></div>    </div>
   </li>
   <li>
     <p>Near the end of the <code class="language-plaintext highlighter-rouge">Dockerfile</code>, the code is copied into the image with the
-<code class="language-plaintext highlighter-rouge">COPY</code> command. The code is copied into the image, so that we can install
-it’s dependencies and make sure it builds deterministically. However, when
-the user runs the <code class="language-plaintext highlighter-rouge">docker compose up</code> command, the code on the host system
-is mounted over the code that was previously copied into the image. This
-allows changes to the repository code to show up immediately inside the
-container for incremental builds.</p>
-  </li>
-  <li>
-    <p>Finally, <code class="language-plaintext highlighter-rouge">rosdep</code> is used to install the repository’s dependencies and
-<code class="language-plaintext highlighter-rouge">colcon</code> is used to perform the workspace build. In addition, the
-workspace’s <code class="language-plaintext highlighter-rouge">local_setup.bash</code> is added to the <code class="language-plaintext highlighter-rouge">ros</code> user’s <code class="language-plaintext highlighter-rouge">.bashrc</code> file,
-so that it’s resources are immediately available when the container is
-entered.</p>
+<code class="language-plaintext highlighter-rouge">COPY</code> command.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> COPY --chown=ros ./src src
+</code></pre></div>    </div>
+
+    <p>The code is copied into the image, so that we can install it’s dependencies
+and make sure it builds deterministically. However, when the user runs the
+<code class="language-plaintext highlighter-rouge">docker compose up</code> command, the code on the host system is mounted over the
+code that was previously copied into the image. This allows changes to the
+repository code to show up immediately inside the container for incremental
+builds. During the initial building of the image, the code that was copied
+into the image is built with:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
+     &amp;&amp; sudo rosdep install --from-paths . --ignore-src -r -y --rosdistro=${ROS_DISTRO} \
+     &amp;&amp; colcon build --symlink-install \
+     &amp;&amp; echo 'source ~/workspace/install/local_setup.bash' &gt;&gt; /home/$USERNAME/.bashrc
+</code></pre></div>    </div>
+
+    <p>The ROS package dependencies listed in the <code class="language-plaintext highlighter-rouge">package.xml</code> files are
+ installed during the <code class="language-plaintext highlighter-rouge">rosdep install</code> command. <code class="language-plaintext highlighter-rouge">colcon</code> is used to perform
+ the workspace build. In addition, the workspace’s <code class="language-plaintext highlighter-rouge">local_setup.bash</code> is
+ added to the <code class="language-plaintext highlighter-rouge">ros</code> user’s <code class="language-plaintext highlighter-rouge">.bashrc</code> file, so that it’s resources are
+ immediately available when the container is entered.</p>
   </li>
 </ol>
+
+<h2 id="wrap-up">Wrap Up</h2>
+
+<p>By maintaining a <code class="language-plaintext highlighter-rouge">Dockerfile</code> and a <code class="language-plaintext highlighter-rouge">docker-compose.yml</code> file for each of your
+ROS projects, you can isolate your ROS development environments from your
+host’s operating system. It might be overkill to create a set of Docker files
+for each ROS repository, but you might want to create a Docker development
+environment for each set of ROS packages that you use for an overall
+project. Typically, this would be at the ROS workspace level, but it could
+cover multiple workspaces as well.</p>
+
+<p>Finally, I use <a href="http://wiki.ros.org/vcstool">vcstool</a> to track the various git
+repositories in my workspace’s <code class="language-plaintext highlighter-rouge">src</code> folder. It is common practice in ROS
+development to maintain a vcstool <code class="language-plaintext highlighter-rouge">.repos</code> file, which contains a list of the
+git repositories that your project depends on for source builds. I track my
+project’s <code class="language-plaintext highlighter-rouge">.repos</code> file alongside the <code class="language-plaintext highlighter-rouge">Dockerfile</code> and <code class="language-plaintext highlighter-rouge">docker-compose.yml</code>
+files. Take a look at our <a href="https://github.com/RIF-Robotics/dingo_setup">Docker configuration
+repo</a> for the Clearpath Dingo for
+an example.</p>
 
 <h2 id="looking-forward">Looking Forward</h2>
 
 <p>In a future post I will describe how I use <a href="https://direnv.net/"><code class="language-plaintext highlighter-rouge">direnv</code></a> to
-quickly open multiple ROS Docker containers.</p>]]></content><author><name>Kevin DeMarco</name></author><category term="ROS" /><category term="Docker" /><category term="docker-compose" /><category term="robotics" /><category term="programming" /><category term="development" /><summary type="html"><![CDATA[If you use the Robot Operating System (ROS) and you are frusterated with system dependencies, incompatible ROS / Linux operating system versions, and non-determinstic builds, then this article is for you.]]></summary></entry><entry><title type="html">A hoarder’s guide to wood storage</title><link href="https://kevindemarco.com/woodworking/storage/2021/02/22/wood-rack.html" rel="alternate" type="text/html" title="A hoarder’s guide to wood storage" /><published>2021-02-22T09:45:00-05:00</published><updated>2021-02-22T09:45:00-05:00</updated><id>https://kevindemarco.com/woodworking/storage/2021/02/22/wood-rack</id><content type="html" xml:base="https://kevindemarco.com/woodworking/storage/2021/02/22/wood-rack.html"><![CDATA[<p>Do you actually have a hoarding problem if you can build efficient storage
+quickly open multiple ROS Docker container terminals.</p>]]></content><author><name>Kevin DeMarco</name></author><category term="ROS" /><category term="Docker" /><category term="docker-compose" /><category term="robotics" /><category term="programming" /><category term="development" /><summary type="html"><![CDATA[If you use the Robot Operating System (ROS) and you are frustrated with system dependencies, incompatible ROS / Linux operating system versions, and non-deterministic builds, then this article is for you.]]></summary></entry><entry><title type="html">A hoarder’s guide to wood storage</title><link href="https://kevindemarco.com/woodworking/storage/2021/02/22/wood-rack.html" rel="alternate" type="text/html" title="A hoarder’s guide to wood storage" /><published>2021-02-22T09:45:00-05:00</published><updated>2021-02-22T09:45:00-05:00</updated><id>https://kevindemarco.com/woodworking/storage/2021/02/22/wood-rack</id><content type="html" xml:base="https://kevindemarco.com/woodworking/storage/2021/02/22/wood-rack.html"><![CDATA[<p>Do you actually have a hoarding problem if you can build efficient storage
 solutions for things that you can’t throw away? I’m not going to answer that
 question because I probably won’t like the answer.</p>
 

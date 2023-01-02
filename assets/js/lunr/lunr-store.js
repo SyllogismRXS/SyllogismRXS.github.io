@@ -24,7 +24,7 @@ var store = [{
         "teaser": "/assets/images/2021-02-22-wood-rack/wood-on-rack-2.jpg"
       },{
         "title": "ROS Development in Docker",
-        "excerpt":"If you use the Robot Operating System (ROS) and you are frusterated with system dependencies, incompatible ROS / Linux operating system versions, and non-determinstic builds, then this article is for you. For each of my ROS development workspaces, I create a Docker development environment to isolate the ROS environment from...","categories": ["ROS","Docker","docker-compose","robotics","programming","development"],
+        "excerpt":"If you use the Robot Operating System (ROS) and you are frustrated with system dependencies, incompatible ROS / Linux operating system versions, and non-deterministic builds, then this article is for you. For each of my ROS projects, I create a Docker development environment to isolate the ROS environment from my...","categories": ["ROS","Docker","docker-compose","robotics","programming","development"],
         "tags": [],
         "url": "/ros/docker/docker-compose/robotics/programming/development/2022/12/28/ros-docker.html",
         "teaser": "/assets/images/2022-12-28-ros-docker/docker-ros.png"
